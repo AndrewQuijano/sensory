@@ -45,6 +45,6 @@ public extension UICollectionReusableView {
     class func _registerHeaderToCollectionView(_ cv: UICollectionView) {
         let name = _className()
         let nib = UINib(nibName: name, bundle: Bundle.main)
-        cv.register(nib, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: name)
+        cv.register(nib, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: name)
     }
 }

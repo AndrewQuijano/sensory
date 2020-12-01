@@ -34,7 +34,7 @@ class DataCollector: NSObject {
   
   func registerForNotifications() {
     let notificationCenter = NotificationCenter.default
-    notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+    notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
   }
   
   
@@ -49,26 +49,34 @@ class DataCollector: NSObject {
   
   func startDataCollection() {
     let status = CLLocationManager.authorizationStatus()
+    print("startDataCollection")
+    
     if status == .authorizedWhenInUse || status == .authorizedAlways {
       Compass.startMonitoringBackgroundLocation(kCLLocationAccuracyBest) { (location) in
         self.lastLocationReading = location
       }
-      
-      Locomotion.streamBarometerData { (altitudeData, error) in
+    print("check 1")
+    
+    Locomotion.streamBarometerData { (altitudeData, error) in
         self.lastAltitudeReading = altitudeData
-        
         //track base altitude
+        print("check 3")
         if self.shouldSetBaseAltitude {
           self.baseAltitude = altitudeData
           self.shouldSetBaseAltitude = false
         }
       }
       
+   
       Locomotion.streamAccelerometerUpdates { (accelData, error) in
         let dp = self.generateDatapointFrom(self.lastAltitudeReading, location: self.lastLocationReading, accelData: accelData)
+        print("check 4")
         if let dp = dp {
+        //print(self.dataQueue)
           self.dataQueue.append(dp)
-          if self.dataQueue.count > self.uploadThreshold {
+            //print(self.dataQueue)
+            if self.dataQueue.count > self.uploadThreshold {
+           // print(self.uploadDataQueue())
             self.uploadDataQueue()
           }
         }
@@ -77,7 +85,7 @@ class DataCollector: NSObject {
   }
   
   //MARK: - Data Upload
-  func appMovedToBackground() {
+    @objc func appMovedToBackground() {
     print("App moved to background!")
     uploadDataQueue()
   }
@@ -95,7 +103,8 @@ class DataCollector: NSObject {
       .responseJSON { response in
         switch response.result {
         case .success:
-          print("data uploaded")
+          print("data uploaded1")
+          
           onSuccess?()
         case .failure(let error):
           print(error)
@@ -107,24 +116,38 @@ class DataCollector: NSObject {
   
   
   class func predictLocation(_ onSuccess:@escaping ((_ floor: Double) -> ()), onFailure:@escaping ((_ error: NSError) -> ())) {
-    let local = DataCollector.sharedInstace
     
-    //    if let altNow = local.lastAltitudeReading, let base = local.baseAltitude {
-    //
-    //      let delta = altNow.relativeAltitude.doubleValue - base.relativeAltitude.doubleValue
-    //
-    //      var floor = ceil(delta / 3.0)
-    //      if floor == -0 {
-    //        floor = 0
-    //      }
-    //      onSuccess(floor: floor)
-    //
-    //
-    //    }else {
-    //      onFailure(error: NSError(domain: "app", code: 1, userInfo: ["error":"notFound"]))
-    //    }
+    let local = DataCollector.sharedInstace
+//    print("sharedInstace")
+//    print(sharedInstace)
+//    print("baseAlt")
+//    print(sharedInstace.baseAltitude)
+//    print("dataque")
+//    print(sharedInstace.dataQueue)
+//    print("check 5")
+//    print("local.lastAltitudeReading")
+//    print(local.lastAltitudeReading)
+    
+    
+//        if let altNow = local.lastAltitudeReading, let base = local.baseAltitude {
+//
+//          let delta = altNow.relativeAltitude.doubleValue - base.relativeAltitude.doubleValue
+//
+//          var floor = ceil(delta / 3.0)
+//          if floor == -0 {
+//            floor = 0
+//          }
+//            onSuccess(floor)
+//
+//
+//        }else {
+//            onFailure(NSError(domain: "app", code: 1, userInfo: ["error":"notFound"]))
+//        }
     //clear the dataQ in preparation for uploading
     let tempData = local.dataQueue
+    print("check 6")
+    print(local.dataQueue)
+    print(Locomotion.sharedInstance.motionManager?.magnetometerData)
     local.dataQueue.removeAll()
     
     let url = "\(AppSettings.API_ROOT())/predict"
@@ -135,12 +158,17 @@ class DataCollector: NSObject {
         switch response.result {
         case .success:
           print("data uploaded")
+          
           if let json = response.result.value as? NSDictionary {
-            let floor = json["floor"] as! Double
-            onSuccess(floor)
+            let floor = json["floor"] as? Double
+            
+            onSuccess(floor ?? 0.0)
           }
+            
         case .failure(let error):
+          print("uh oh...")
           print(error)
+          print(url)
           print(error.localizedDescription)
           onFailure(error as NSError)
         }
@@ -166,6 +194,7 @@ class DataCollector: NSObject {
         "device_id" : UIDevice.current.identifierForVendor!.uuidString as AnyObject,
         "alt": altitudeData.relativeAltitude.doubleValue as AnyObject,
         "alt_pressure": altitudeData.pressure.doubleValue as AnyObject
+        
       ];
       
       return dp

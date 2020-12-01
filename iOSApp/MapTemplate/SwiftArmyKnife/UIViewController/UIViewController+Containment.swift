@@ -13,8 +13,8 @@ public extension UIViewController {
     ///Presents an alert controller with OK button
     func _presentAlertControllerWithTitle(_ title: String, message: String, defaultButtonTitle:String) {
         
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        let action = UIAlertAction(title: defaultButtonTitle, style: UIAlertActionStyle.default, handler: nil)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        let action = UIAlertAction(title: defaultButtonTitle, style: UIAlertAction.Style.default, handler: nil)
         alertController.addAction(action)
         
         self.present(alertController, animated: true, completion: nil)
@@ -23,9 +23,9 @@ public extension UIViewController {
     ///Presents an alert controller with OK button
     func _presentAlertControllerWithTitle(_ title: String, message: String, defaultButtonTitle:String, onButtonPress:(()->())?) {
         
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
 
-        let action = UIAlertAction(title: defaultButtonTitle, style: UIAlertActionStyle.default) { (action) -> Void in
+        let action = UIAlertAction(title: defaultButtonTitle, style: UIAlertAction.Style.default) { (action) -> Void in
             onButtonPress?()
         }
 

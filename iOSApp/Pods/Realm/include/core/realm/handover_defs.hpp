@@ -31,7 +31,10 @@ struct RowBaseHandoverPatch;
 struct TableViewHandoverPatch;
 
 struct TableHandoverPatch {
+    bool m_is_sub_table;
     size_t m_table_num;
+    size_t m_col_ndx;
+    size_t m_row_ndx;
 };
 
 struct LinkViewHandoverPatch {
@@ -54,20 +57,40 @@ struct QueryHandoverPatch {
     QueryNodeHandoverPatches m_node_data;
 };
 
-struct SortDescriptorHandoverPatch {
-    std::vector<std::vector<size_t>> columns;
-    std::vector<bool> ascending;
+enum class DescriptorType { Sort, Distinct, Limit, Include };
+
+struct DescriptorLinkPath {
+    DescriptorLinkPath(size_t column_index, size_t table_index, bool column_is_backlink)
+        : col_ndx(column_index)
+        , table_ndx(table_index)
+        , is_backlink(column_is_backlink)
+    {
+    }
+
+    size_t col_ndx;
+    size_t table_ndx;
+    bool is_backlink = false;
+};
+
+struct DescriptorExport {
+    DescriptorType type;
+    std::vector<std::vector<DescriptorLinkPath>> columns;
+    std::vector<bool> ordering;
+    size_t limit;
+};
+
+struct DescriptorOrderingHandoverPatch {
+    std::vector<DescriptorExport> descriptors;
 };
 
 struct TableViewHandoverPatch {
     std::unique_ptr<TableHandoverPatch> m_table;
-    std::unique_ptr<TableHandoverPatch> linked_table;
     std::unique_ptr<RowBaseHandoverPatch> linked_row;
+    size_t linked_col;
     bool was_in_sync;
     QueryHandoverPatch query_patch;
     std::unique_ptr<LinkViewHandoverPatch> linkview_patch;
-    std::unique_ptr<SortDescriptorHandoverPatch> sort_patch;
-    std::unique_ptr<SortDescriptorHandoverPatch> distinct_patch;
+    std::unique_ptr<DescriptorOrderingHandoverPatch> descriptors_patch;
 };
 
 

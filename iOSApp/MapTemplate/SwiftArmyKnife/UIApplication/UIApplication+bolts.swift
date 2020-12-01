@@ -12,7 +12,7 @@ import Foundation
 public extension UIApplication {
 
     class func _jumpToSettings() {
-        if let appSettings = URL(string: UIApplicationOpenSettingsURLString) {
+        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.openURL(appSettings as URL)
         }
     }

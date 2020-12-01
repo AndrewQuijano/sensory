@@ -38,25 +38,25 @@ public extension NSMutableAttributedString {
 
     ///Sets text color
     func _setTextColor(_ color:UIColor) {
-        self.addAttribute(NSForegroundColorAttributeName, value: color, range: _fullRange())
+        self.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: _fullRange())
     }
 
     func _setTextColorInrange(_ color:UIColor, range:NSRange) {
-        self.addAttribute(NSForegroundColorAttributeName, value: color, range: range)
+        self.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
     }
 
     ///Sets text font
     func _setTextFont(_ font:UIFont) {
-        self.addAttribute(NSFontAttributeName, value: font, range: _fullRange())
+        self.addAttribute(NSAttributedString.Key.font, value: font, range: _fullRange())
     }
 
     ///Sets strike through
     func _setStrikeThrough() {
-        self.addAttribute(NSStrikethroughStyleAttributeName, value: 1, range: _fullRange())
+        self.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: _fullRange())
     }
 
     func _setStrikeThroughInRange(_ range:NSRange) {
-        self.addAttribute(NSStrikethroughStyleAttributeName, value: 1, range: range)
+        self.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: range)
     }
 
     ///Changes line spacing for the attributed string
@@ -66,7 +66,7 @@ public extension NSMutableAttributedString {
         paragraphStyle.lineSpacing = value
         paragraphStyle.lineHeightMultiple = 0.5
 
-        self.addAttribute(NSParagraphStyleAttributeName, value:paragraphStyle, range:NSMakeRange(0, self.length))
+        self.addAttribute(NSAttributedString.Key.paragraphStyle, value:paragraphStyle, range:NSMakeRange(0, self.length))
     }
 }
 

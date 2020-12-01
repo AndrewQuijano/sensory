@@ -36,11 +36,11 @@ class AddressbookViewController: UIViewController {
   @IBAction func rightNavButtonPressed(_ sender: UIButton) {
     if tableView.isEditing {
       tableView.isEditing = false
-      rightNavButton.setTitle("Edit", for: UIControlState())
+      rightNavButton.setTitle("Edit", for: UIControl.State())
       leftNavButton.isHidden = false
     }else {
       tableView.isEditing = true
-      rightNavButton.setTitle("Done", for: UIControlState())
+      rightNavButton.setTitle("Done", for: UIControl.State())
       leftNavButton.isHidden = true
     }
   }

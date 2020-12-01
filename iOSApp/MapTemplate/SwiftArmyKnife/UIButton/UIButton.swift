@@ -32,7 +32,7 @@ public extension UIButton {
 
     //MARK: - Tinted Button
     ///Sets image tint of an image for a state
-    func _setImageTintColor(color:UIColor, forState state:UIControlState) {
+    func _setImageTintColor(color:UIColor, forState state:UIControl.State) {
 
         if let _ = self.imageView?.image {
             var tintedImage = self.image(for: state)!
@@ -44,7 +44,7 @@ public extension UIButton {
     }
 
     ///Tints the images of an array of buttons with a color
-    func _tintButtonImages(buttons:NSArray, withColor color:UIColor, forState state:UIControlState) {
+    func _tintButtonImages(buttons:NSArray, withColor color:UIColor, forState state:UIControl.State) {
         for obj in buttons {
             let button = obj as! UIButton
             button._setImageTintColor(color: color, forState: state)
@@ -52,7 +52,7 @@ public extension UIButton {
     }
 
     ///Sets background tint color for button
-    func _setBackgroundTintColor(color:UIColor, forState state:UIControlState) {
+    func _setBackgroundTintColor(color:UIColor, forState state:UIControl.State) {
         if let ownBackgroundImage = self.backgroundImage(for: state) {
             let tintedImage = self.tindedImage(image: ownBackgroundImage, withColor: color)
             self.setBackgroundImage(tintedImage, for: state)
@@ -62,7 +62,7 @@ public extension UIButton {
     }
 
     ///Tints the background images of an array of buttons with a color
-    func _tintButtonBackgrounds(buttons:NSArray, withColor color:UIColor, forState state:UIControlState) {
+    func _tintButtonBackgrounds(buttons:NSArray, withColor color:UIColor, forState state:UIControl.State) {
         for obj in buttons {
             let button = obj as! UIButton
             button._setBackgroundTintColor(color: color, forState: state)

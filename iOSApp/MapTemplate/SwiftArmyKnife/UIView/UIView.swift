@@ -29,7 +29,7 @@ import UIKit
 
 public extension UIView {
     
-    func _addBlur(_ style: UIBlurEffectStyle) {
+    func _addBlur(_ style: UIBlurEffect.Style) {
         let blurEffect = UIBlurEffect(style: style)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = self.bounds
@@ -144,7 +144,9 @@ public extension UIView {
     
     ///Removes swift class identifiers and returns clean class name
     class func _className() -> String {
-        return NSStringFromClass(type(of: self) as! AnyClass).components(separatedBy: ".")[0] as String
+        
+        print(NSStringFromClass(self as! AnyClass).components(separatedBy:"."))
+        return NSStringFromClass(self as! AnyClass).components(separatedBy:".")[1] as String
     }
 }
 

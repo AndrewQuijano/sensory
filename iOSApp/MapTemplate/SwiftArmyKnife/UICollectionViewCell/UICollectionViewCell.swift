@@ -32,16 +32,16 @@ public extension UICollectionViewCell {
 
     //MARK: - Computed Properties
 
-    /// Returns the class name of this cell as the identifier.
-    override var _cellIdentifier : String {
-        let identifier =  NSStringFromClass(type(of: self)).components(separatedBy: ".")[0]
-        return identifier
-    }
-
-    /// Returns the class name of this cell as the identifier.
-    override class func _identifier() -> String {
-        return _className()
-    }
+//    /// Returns the class name of this cell as the identifier.
+//    var _cellIdentifier : String {
+//        let identifier =  NSStringFromClass(type(of: self)).components(separatedBy: ".")[0]
+//        return identifier
+//    }
+//
+//    /// Returns the class name of this cell as the identifier.
+//    class func _identifier() -> String {
+//        return _className()
+//    }
 
     //MARK: - Methods
     /// Registers this cell to the passed in collectionView

@@ -11,7 +11,7 @@ import SystemConfiguration.CaptiveNetwork
 
 public class SSID {
     class func fetchSSIDInfo() -> String {
-        var currentSSID = ""
+        let currentSSID = ""
         if let interfaces = CNCopySupportedInterfaces() {
             for i in 0..<CFArrayGetCount(interfaces) {
                 let interfaceName: UnsafeRawPointer = CFArrayGetValueAtIndex(interfaces, i)
@@ -19,7 +19,7 @@ public class SSID {
                 let rec = unsafeBitCast(interfaceName, to: AnyObject.self)
                 let unsafeInterfaceData = CNCopyCurrentNetworkInfo("\(rec)" as CFString)
                 if unsafeInterfaceData != nil {
-                    let interfaceData = unsafeInterfaceData! as Dictionary!
+                    _ = unsafeInterfaceData as Dictionary?
                     //currentSSID = interfaceData["SSID"] as! String
                 }
             }

@@ -27,31 +27,39 @@ class Locomotion: NSObject {
     }
     
     class func streamAccelerometerUpdates(_ onMotion: @escaping CMAccelerometerHandler) {
+        
+        print("")
+        print("stream accelerometer")
         let motionManager = Locomotion.sharedInstance.motionManager!
+        print(motionManager)
         motionManager.accelerometerUpdateInterval = 1.0
         motionManager.startAccelerometerUpdates(to: OperationQueue.main, withHandler: onMotion)
-        //        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.mainQueue()) { (data, error) in
-        //
-        //            //turn into dict
-        //            if let lastLoc = self.lastLocation {
-        //                let datapoint = self.generateDatapointFromLocation(lastLoc)
-        //
-        //                //track json DP ONLY if have barometer pressure
-        //                if let jsonDP = self.generateJSONDatapointForLocation(lastLoc) {
-        //                    self.jsonDataPoints.addObject(jsonDP)
-        //                    self.pointCountLabel.text = "DPs: \(self.jsonDataPoints.count)"
-        //
-        //                    if (self.jsonDataPoints.count % 5 == 0) {
-        //                        //reload to show point
-        //                        self.tableView.reloadData()
-        //                    }
-        //                }
-        //
-        //                //track last point for view
-        //                self.dataPoints.addObject(datapoint)
-        //
-        //            }
-        //        }
+        print(motionManager.accelerometerData)
+        print("motionManager.accelerometerData")
+        print(OperationQueue.current)
+        print("")
+//        motionManager.startAccelerometerUpdates(to: OperationQueue.main) { (data, error) in
+//
+//                    //turn into dict
+//                    if let lastLoc = self.lastLocation {
+//                        let datapoint = self.generateDatapointFromLocation(lastLoc)
+//
+//                        //track json DP ONLY if have barometer pressure
+//                        if let jsonDP = self.generateJSONDatapointForLocation(lastLoc) {
+//                            self.jsonDataPoints.addObject(jsonDP)
+//                            self.pointCountLabel.text = "DPs: \(self.jsonDataPoints.count)"
+//
+//                            if (self.jsonDataPoints.count % 5 == 0) {
+//                                //reload to show point
+//                                self.tableView.reloadData()
+//                            }
+//                        }
+//
+//                        //track last point for view
+//                        self.dataPoints.addObject(datapoint)
+//
+//                    }
+//                }
     }
     
     class func signalStrength() -> Double {
@@ -59,9 +67,9 @@ class Locomotion: NSObject {
         let bar = app.value(forKey: "statusBar")!
         let fv = (bar as AnyObject).value(forKey: "foregroundView") as! UIView
         let svs = fv.subviews
-        for var view in svs {
+        for view in svs {
             if view.isKind(of: NSClassFromString("UIStatusBarSignalStrengthItemView")!) {
-                var strength = view.value(forKey: "signalStrengthRaw")! as! Double
+                let strength = view.value(forKey: "signalStrengthRaw")! as! Double
                 return strength
             }
             
@@ -70,10 +78,14 @@ class Locomotion: NSObject {
     }
     
     class func streamBarometerData(_ onData: @escaping CMAltitudeHandler) {
-        
+        print("CHECK STREAM BAROMETER")
+        print(CMAltimeter.isRelativeAltitudeAvailable())
         if CMAltimeter.isRelativeAltitudeAvailable() {
             let altimeter = Locomotion.sharedInstance.altimeter!
+            print("streamBarometer")
+            print(altimeter)
             altimeter.startRelativeAltitudeUpdates(to: OperationQueue.main, withHandler: onData)
+            
             
         }
     }

@@ -45,7 +45,7 @@ public extension Array {
     
     func _indexOf <T: Equatable> (_ item: T) -> Int? {
         if item is Element {
-            return unsafeBitCast(self, to: [T].self).index(of: item)
+            return unsafeBitCast(self, to: [T].self).firstIndex(of: item)
         }
         
         return nil

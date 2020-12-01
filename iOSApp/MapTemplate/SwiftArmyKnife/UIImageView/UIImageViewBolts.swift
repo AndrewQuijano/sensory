@@ -45,7 +45,7 @@ public extension UIImageView {
     /// Tints imageView
     func _tintWithColor(color:UIColor) {
         DispatchQueue.main.async {
-            let coloredImage = self.image?.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
+            let coloredImage = self.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
             self.image = coloredImage
             self.tintColor = color
         }

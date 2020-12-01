@@ -13,7 +13,7 @@ public extension MKMapView {
     
     func _mapWidthInMeters() -> CLLocationDistance {
         let deltaLon = self.region.span.longitudeDelta
-        let latCircumference = 40075160 * cos(self.region.center.latitude * M_PI / 180)
+        let latCircumference = 40075160 * cos(self.region.center.latitude * Double.pi / 180)
         return deltaLon * latCircumference / 360
     }
     
@@ -26,7 +26,7 @@ public extension MKMapView {
         } else if angleCamera > 90 {
             angleCamera = fabs(angleCamera - 180)
         }
-        let angleRad = M_PI * angleCamera / 180 // camera heading in radians
+        let angleRad = Double.pi * angleCamera / 180 // camera heading in radians
         let width = Double(self.frame.size.width)
         let height = Double(self.frame.size.height)
         let heightOffset : Double = 20 // the offset (status bar height) which is taken by MapKit into consideration to calculate visible area height
@@ -49,9 +49,9 @@ public extension MKMapView {
     
     func _widthInMeters() -> Double {
         let mRect: MKMapRect = self.visibleMapRect
-        let eastMapPoint = MKMapPointMake(MKMapRectGetMinX(mRect), MKMapRectGetMidY(mRect))
-        let westMapPoint = MKMapPointMake(MKMapRectGetMaxX(mRect), MKMapRectGetMidY(mRect))
-        let currentDistWideInMeters = MKMetersBetweenMapPoints(eastMapPoint, westMapPoint)
+        let eastMapPoint = MKMapPoint.init(x: mRect.minX, y: mRect.midY)
+        let westMapPoint = MKMapPoint.init(x: mRect.maxX, y: mRect.midY)
+        let currentDistWideInMeters = eastMapPoint.distance(to: westMapPoint)
         return currentDistWideInMeters
     }
     

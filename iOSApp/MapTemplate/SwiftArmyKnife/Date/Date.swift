@@ -48,9 +48,9 @@ public extension Date {
     static func _nowEST() -> Date {
         let locale = NSLocale(localeIdentifier: POSIX.US)
         let formatter = DateFormatter()
-        formatter.locale = locale as Locale!
+        formatter.locale = locale as Locale?
         formatter.dateFormat = DateFormat.UTC
-        formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0) as TimeZone!
+        formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0) as TimeZone?
 
         return formatter.date(from: Date._now().description)! as Date
     }
@@ -131,7 +131,7 @@ public extension Date {
     func _dateGMTString() -> NSString {
         let formatter = DateFormatter()
         formatter.dateFormat = DateFormat.UTC
-        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone!
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         
         return formatter.string(from: self as Date) as NSString
     }

@@ -14,7 +14,7 @@ class Compass: NSObject {
     static let sharedInstance = Compass()
     var locationManager: CLLocationManager!
     var locationUpdateBlock : ((_ location: CLLocation)->())?
-    var visitUpdateBlock : ((_ visit: CLVisit)->())?
+    var visitUpdateBlock : ((_ visit: CLVisit) ->())?
     var lastLocation : CLLocation?
     var lastVisit : CLVisit?
     

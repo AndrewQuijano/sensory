@@ -10,30 +10,7 @@ import UIKit
 import Charts
 import Alamofire
 import SVProgressHUD
-// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
-// Consider refactoring the code to use the non-optional operators.
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
-
-// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
-// Consider refactoring the code to use the non-optional operators.
-fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
-}
-
+import CoreData
 
 class PlotViewController: UIViewController {
   
@@ -92,7 +69,7 @@ class PlotViewController: UIViewController {
 
       var date = dateFormatter.date(from: dateStr)
       date = date?._addMilliseconds(ms: -3600)
-      
+
       let str = date?._dateString(format: "hh:mm:ss")
       x.append(str!)
     }
@@ -104,9 +81,9 @@ class PlotViewController: UIViewController {
     }
     
     
-    DispatchQueue._dispatchMainQueue {
+    DispatchQueue._dispatchMainQueue ({
       self.setChart(x, values: y, data:self.data)
-    }
+    })
   }
   
   func parseSession(_ session:Session) {
@@ -116,7 +93,7 @@ class PlotViewController: UIViewController {
     
     //results
     var dps : [[String: AnyObject]] = []
-    if rows?.count > 1 {
+    if rows!.count > 1 {
       
       //parse each row
       for row in rows![1...rows!.count-1] {
@@ -188,13 +165,13 @@ class PlotViewController: UIViewController {
     
     let size: CGFloat = 4.0
     //Y
-    let indoorsY = ScatterChartDataSet(values: indoorPoints, label: "Indoors")
+    let indoorsY = ScatterChartDataSet(entries: indoorPoints, label: "Indoors")
     indoorsY.setColor(UIColor.red)
     indoorsY.scatterShapeSize = size
     indoorsY.setScatterShape(.circle)
 
     
-    let outdoorsY = ScatterChartDataSet(values: outdoorPoints, label: "Outdoors")
+    let outdoorsY = ScatterChartDataSet(entries: outdoorPoints, label: "Outdoors")
     outdoorsY.scatterShapeSize = size
     outdoorsY.setScatterShape(.circle)
     
@@ -203,7 +180,7 @@ class PlotViewController: UIViewController {
     
     //plot
     chartView.data = chartData
-    chartView.descriptionText = "Prediction results"
+    chartView.chartDescription?.text = "Prediction results"
     
   }
   
@@ -212,8 +189,7 @@ class PlotViewController: UIViewController {
     
     let url = "\(AppSettings.API_ROOT())/test"
     let headers = ["Content-Type": "application/json"]
-    Alamofire.request(url, method: .post, parameters: ["data": self.data], encoding: JSONEncoding.default, headers: headers)
-      .validate()
+    Alamofire.request(url, method: .post, parameters: ["data": self.data], encoding: JSONEncoding.default, headers: headers).validate()
       .responseJSON { response in
         switch response.result {
         case .success:

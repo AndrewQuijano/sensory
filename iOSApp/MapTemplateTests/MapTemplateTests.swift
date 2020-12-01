@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import MapTemplate
+//@testable import MapTemplate
 
 class MapTemplateTests: XCTestCase {
     
@@ -28,7 +28,7 @@ class MapTemplateTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

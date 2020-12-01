@@ -34,7 +34,7 @@ public extension DispatchQueue {
     fileprivate static var _onceTracker = [String]()
 
     ///Executes code with delay
-    public class func _delay(_ delay:Double, closure:@escaping ()->()) {
+    class func _delay(_ delay:Double, closure:@escaping ()->()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             // your code here
             closure()
@@ -42,13 +42,13 @@ public extension DispatchQueue {
     }
 
     ///Places on main q
-    public class func _dispatchMainQueue(_ closure:@escaping ()->()) {
+    class func _dispatchMainQueue(_ closure:@escaping ()->()) {
         DispatchQueue.main.async {
             closure()
         }
     }
 
-    public class func _dispatchToBackgroundQueueWithPriority(_ priority:Int, closure:@escaping ()->()) {
+    class func _dispatchToBackgroundQueueWithPriority(_ priority:Int, closure:@escaping ()->()) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.default).async {
             closure()
         }
@@ -56,7 +56,7 @@ public extension DispatchQueue {
 
     ///Dispatches code once
     ///Credit: http://stackoverflow.com/questions/37886994/dispatch-once-in-swift-3
-    public class func _once(_ token: String, block:(Void)->Void) {
+    class func _once(_ token: String, block:()->Void) {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
         
         if _onceTracker.contains(token) {

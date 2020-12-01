@@ -24,6 +24,7 @@ extension MapViewController: MKMapViewDelegate {
           }, onFailure: { (error) in
             print(error)
         })
+        
     }
   }
   
