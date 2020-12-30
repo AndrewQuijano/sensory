@@ -55,9 +55,8 @@ public extension UIViewController {
     
     /// Storyboard name is the class of this VC without the words ViewController
     class func _storyboardName() -> String {
-        print("hi")
+        
         var x = NSStringFromClass(self as! AnyClass).components(separatedBy:".")
-        print(x)
         var sbName = NSStringFromClass(self as AnyClass).components(separatedBy:".")[1]
         
         sbName = sbName._removeString("ViewController")!

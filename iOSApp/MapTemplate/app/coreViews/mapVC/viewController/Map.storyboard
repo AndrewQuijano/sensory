@@ -10,6 +10,12 @@
         <!--Map View Controller-->
         <scene sceneID="ZE3-3Q-yI2">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sJ3-7J-mcc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer cancelsTouchesInView="NO" id="68r-4m-pN6">
+                    <connections>
+                        <action selector="mapTappedWithSender:" destination="BM2-Ph-SYx" id="1dy-KU-mGx"/>
+                    </connections>
+                </tapGestureRecognizer>
                 <viewController storyboardIdentifier="MapViewController" id="BM2-Ph-SYx" customClass="MapViewController" customModule="Sensory" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="wUy-Ho-eKY"/>
@@ -292,12 +298,6 @@
                         <outlet property="targetImageView" destination="sdl-Vu-ZzF" id="PBp-tU-nKF"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sJ3-7J-mcc" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer cancelsTouchesInView="NO" id="68r-4m-pN6">
-                    <connections>
-                        <action selector="mapTappedWithSender:" destination="BM2-Ph-SYx" id="1dy-KU-mGx"/>
-                    </connections>
-                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="252" y="637"/>
         </scene>

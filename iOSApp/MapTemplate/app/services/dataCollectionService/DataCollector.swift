@@ -20,7 +20,11 @@ class DataCollector: NSObject {
   var dataQueue: [[String : AnyObject]] = []
   var baseAltitude: CMAltitudeData?
   var shouldSetBaseAltitude = false
-  
+  static let motionManager = CMMotionManager()
+    var city: String?
+    var country: String?
+  var avgFloors = ["0-2", "3-5", "6-10", "10-20", "20-50", "50+"]
+  var activities = ["walking", "running", "biking", "subway", "driving", "boat", "plane"]
   
   //MARK: - Init
   override fileprivate init() {
@@ -60,17 +64,18 @@ class DataCollector: NSObject {
     Locomotion.streamBarometerData { (altitudeData, error) in
         self.lastAltitudeReading = altitudeData
         //track base altitude
-        print("check 3")
+        print("check datacollector/ Locomotion.streamBarometerData")
         if self.shouldSetBaseAltitude {
           self.baseAltitude = altitudeData
           self.shouldSetBaseAltitude = false
         }
       }
+        
       
-   
+//        Locomotion.streamMagnetometerUpdates {(magnetometerData, error) in let x = }
       Locomotion.streamAccelerometerUpdates { (accelData, error) in
         let dp = self.generateDatapointFrom(self.lastAltitudeReading, location: self.lastLocationReading, accelData: accelData)
-        print("check 4")
+        print("check datacollector/ Locomotion.streamAcellerometerUpdates")
         if let dp = dp {
         //print(self.dataQueue)
           self.dataQueue.append(dp)
@@ -97,13 +102,13 @@ class DataCollector: NSObject {
     
     let url = "\(AppSettings.API_ROOT())/train"
     let headers = ["Content-Type": "application/json"]
-
+    
     Alamofire.request(url, method: .post, parameters: ["data": tempData], encoding: JSONEncoding.default, headers: headers)
       .validate()
       .responseJSON { response in
         switch response.result {
         case .success:
-          print("data uploaded1")
+          print("data uploaded")
           
           onSuccess?()
         case .failure(let error):
@@ -145,9 +150,15 @@ class DataCollector: NSObject {
 //        }
     //clear the dataQ in preparation for uploading
     let tempData = local.dataQueue
-    print("check 6")
-    print(local.dataQueue)
-    print(Locomotion.sharedInstance.motionManager?.magnetometerData)
+//    print("check local.DataQueue")
+//    print(local.dataQueue)
+    
+    motionManager.startMagnetometerUpdates()
+//    print("datacollector magnets")
+//    print("x",motionManager.magnetometerData?.magneticField.x)
+//    print("y",motionManager.magnetometerData?.magneticField.y)
+//    print("z",motionManager.magnetometerData?.magneticField.z)
+    
     local.dataQueue.removeAll()
     
     let url = "\(AppSettings.API_ROOT())/predict"
@@ -157,7 +168,7 @@ class DataCollector: NSObject {
       .responseJSON { response in
         switch response.result {
         case .success:
-          print("data uploaded")
+//          print("data uploaded")
           
           if let json = response.result.value as? NSDictionary {
             let floor = json["floor"] as? Double
@@ -166,23 +177,19 @@ class DataCollector: NSObject {
           }
             
         case .failure(let error):
-          print("uh oh...")
-          print(error)
-          print(url)
-          print(error.localizedDescription)
+          
           onFailure(error as NSError)
         }
     }
     
   }
   
-  
+    
   //MARK: - Parsing
   func generateDatapointFrom(_ altitudeData: CMAltitudeData?, location: CLLocation?, accelData: CMAccelerometerData?) -> [String : AnyObject]? {
-    
+  
     if let altitudeData = altitudeData, let location = location {
-      
-      let dp : [String: AnyObject] = [
+        var dp : [String: AnyObject] = [
         "created_at": Date()._UTCTimestamp() as AnyObject,
         "latitude": location.coordinate.latitude as AnyObject,
         "longitude": location.coordinate.longitude as AnyObject,
@@ -192,12 +199,45 @@ class DataCollector: NSObject {
         "gps_course": location.course as AnyObject,
         "gps_speed": location.speed as AnyObject,
         "device_id" : UIDevice.current.identifierForVendor!.uuidString as AnyObject,
-        "alt": altitudeData.relativeAltitude.doubleValue as AnyObject,
-        "alt_pressure": altitudeData.pressure.doubleValue as AnyObject
+        "baro_relative_altitude": altitudeData.relativeAltitude.doubleValue as AnyObject,
+        "baro_pressure": altitudeData.pressure.doubleValue as AnyObject,
+        "magnet_x_mt": DataCollector.motionManager.magnetometerData?.magneticField.x as AnyObject,
+        "magnet_y_mt": DataCollector.motionManager.magnetometerData?.magneticField.y as AnyObject,
+        "magnet_z_mt": DataCollector.motionManager.magnetometerData?.magneticField.z as AnyObject,
+        "magnet_total": DataCollector.motionManager.magnetometerData?.magneticField.x as AnyObject,
+            "city_name": "" as AnyObject,
+            "country_name": "" as AnyObject,
+            // troubled ones, still pending
+            "rssi_strength" : Locomotion.signalStrength() as AnyObject,
+            "env_context": "" as AnyObject,
+            "floor": location.floor?.level as AnyObject,
+            "env_mean_bldg_floors": self.avgFloors[0] as AnyObject,
+            "env_activity": self.activities[0] as AnyObject,
+            "indoors": Collector.Indoors(rawValue: 0) as AnyObject
+        ];
+//      print(dp)
+        let x = dp["magnet_x_mt"] as! Double
+        let y = dp["magnet_y_mt"] as! Double
+        let z = dp["magnet_z_mt"] as! Double
+        let total = sqrt((x*x) + (y*y) + (z*z))
+        dp["magnet_total"] = total as AnyObject
+        // https://stackoverflow.com/questions/27735835/convert-coordinates-to-city-name/27740680
+        let geoCoder = CLGeocoder()
+        let location_new = CLLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+        geoCoder.reverseGeocodeLocation(location_new, completionHandler:
+                  {
+                      placemarks, error -> Void in
+                      // Place details
+                      guard let placeMark = placemarks?.first else { return }
+                    self.city = placeMark.subAdministrativeArea
+                    self.country = placeMark.country
+                      
+              })
         
-      ];
-      
-      return dp
+        dp["city_name"] = self.city?.lowercased() as AnyObject
+        dp["country_name"] = self.country?.lowercased() as AnyObject
+        print(dp)
+        return dp
     }
     return nil
   }
