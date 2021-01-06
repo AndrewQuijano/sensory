@@ -191,8 +191,8 @@ class DataCollector: NSObject {
     if let altitudeData = altitudeData, let location = location {
         var dp : [String: AnyObject] = [
         "created_at": Date()._UTCTimestamp() as AnyObject,
-        "latitude": location.coordinate.latitude as AnyObject,
-        "longitude": location.coordinate.longitude as AnyObject,
+        "gps_latitude": location.coordinate.latitude as AnyObject,
+        "gps_longitude": location.coordinate.longitude as AnyObject,
         "gps_alt": location.altitude as AnyObject,
         "gps_vertical_accuracy": location.verticalAccuracy as AnyObject,
         "gps_horizontal_accuracy": location.horizontalAccuracy as AnyObject,
@@ -210,10 +210,10 @@ class DataCollector: NSObject {
             // troubled ones, still pending
             "rssi_strength" : Locomotion.signalStrength() as AnyObject,
             "env_context": "" as AnyObject,
-            "floor": location.floor?.level as AnyObject,
+            "floor": 0 as AnyObject,
             "env_mean_bldg_floors": self.avgFloors[0] as AnyObject,
             "env_activity": self.activities[0] as AnyObject,
-            "indoors": Collector.Indoors(rawValue: 0) as AnyObject
+            "indoors": 0 as AnyObject
         ];
 //      print(dp)
         let x = dp["magnet_x_mt"] as! Double
