@@ -8,12 +8,13 @@ https://github.com/AndrewQuijano/Room_Level_Localization_Server.git
 
 ## Installation
 ** Prerequisites
-This guide will assume you have MySQL installed on your server. Also, it requires the following python packages:  
+This guide will assume you have MySQL installed on your server and you completed any necessary port forwarding for the server to collect the data. Also, it requires the following python packages:  
 
 pandas  
 sqlalchemy  
 configparser  
 flask  
+pymsql
 
 ** iOS Installation
 This was sucessfully tested on the following versions of XCode and iPhones
@@ -24,7 +25,7 @@ Xcode 12.3 -> iPhone 12 with iOS 14.3
 1. You need to set the IP Address of where the server will collect sensory's data. 
 Edit the file:
 iOSApp/MapTemplate/config/AppSettings.swift  
-Replace <YOUR IP HERE> with the IP Address of your server.
+Replace <YOUR IP HERE> with **https://<SERVER-IP>:<PORT-NUMBER>**
 
 2. Open Xcode, and open the iOS/911.xcworkspace file. Opening this file ensures all the cocoapods are loaded as expected.
 
@@ -43,7 +44,7 @@ https://developer.android.com/training/basics/firstapp/running-app
 
 
 ## Usage
-The application will open a world map and zoom in on your GPS coordinates. It will make a guess in which address you are located in.
+The application will open a world map and zoom in on your GPS coordinates. It will make a guess in which address you are located in the [Main Menu](https://github.com/AndrewQuijano/sensory/blob/master/images/main_menu.jpg)
 
 At this point it will also every second send the sensor information to the designated server. 
 
@@ -63,11 +64,11 @@ Falcon, William, and Henning Schulzrinne. "Predicting Floor-Level for 911 Calls 
 
 ## Project status
 Currently the following issues need to resolved
-* The Android version of sensory is still in progress of being refactored before being put on this repository
 * iOS sensory can't collect Wi-Fi MAC Addresses and RSSI signal strength. This may prove to be near impossible as Apple have no equivalent to Wi-Fi manager class as in Android?
 * Documentation needs improvement.
 * Henning requested to investigate if sensory rssi feature is obtained from Wi-Fi or cell tower. Ensure rssi is from Wi-Fi and record in each row the MAC address of the AP.
 * Henning requested to get the barometric pressure at sea level alongside the measurement from the sensors.
-
-Currently, as I have a new iPhone device, this will require some further testing. 
+* Henning requested that I be able to label when the scan was at the walls or center of a room.
+* CURRENT TASK: Push sensory v1 Android version once I get the timer task working. 
+* CURRENT TASK: Have server.py run the predictdb.sql code for automatic scheme and table creation.
 
