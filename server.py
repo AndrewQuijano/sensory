@@ -1,12 +1,9 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import configparser
-from flask import Flask, request, jsonify
-# from flask_mysqldb import MySQL
-import pymysql
-
-
+from flask import Flask, request
 app = Flask(__name__)
+
 
 def get_properties():
     config = configparser.ConfigParser()
@@ -15,12 +12,9 @@ def get_properties():
     passwd = config['Database']['password']
     tbl = config['Database']['table']
     scheme = config['Database']['schema']
-    engine = create_engine("mysql+pymysql://{u}:{p}@{h}/{s}".format(u= usr, p=passwd, h="127.0.0.1:3306",s=scheme), pool_pre_ping=True)
+    engine = create_engine("mysql+pymysql://{u}:{p}@{h}/{s}".format(u=usr, p=passwd, h="127.0.0.1:3306", s=scheme),
+                           pool_pre_ping=True)
     return tbl, engine
-
-
-
-
 
 
 @app.route("/predict", methods=['GET', 'POST'])
@@ -34,8 +28,5 @@ def predict():
     return content
 
 
-
-
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    app.run(host="192.168.1.208", port=3000, debug=True)
