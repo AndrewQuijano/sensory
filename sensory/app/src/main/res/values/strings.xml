@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">sensory</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="activity_unknown">activity_unknown</string>
+    <string name="activity_in_vehicle">activity_in_vehicle</string>
+    <string name="activity_on_bicycle">activity_on_bicycle</string>
+    <string name="activity_on_foot">activity_on_foot</string>
+    <string name="activity_running">activity_running</string>
+    <string name="activity_still">activity_still</string>
+    <string name="activity_tilting">activity_tilting</string>
+    <string name="activity_walking">activity_walking</string>
+    <string name="Confidence">confidence</string>
+</resources>
