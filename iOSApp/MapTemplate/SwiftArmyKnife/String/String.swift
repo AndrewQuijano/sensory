@@ -247,7 +247,7 @@ public extension String {
         }
         return substring
     }
-
+ 
     /// Extracts the characters from a string
     func _removeString(_ str:String) -> String? {
 

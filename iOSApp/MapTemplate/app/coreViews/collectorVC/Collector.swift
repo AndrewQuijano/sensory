@@ -11,6 +11,7 @@ import CoreLocation
 import CoreMotion
 import CoreData
 // Virgil Notes:
+
 // This is meat and potatoes of data collection
 // All of the UITableViewCell might need their own file and class set up
 // This is helpful link I was using: https://www.youtube.com/watch?v=FtO5QT2D_H8

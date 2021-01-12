@@ -63,7 +63,7 @@ class Locomotion: NSObject {
 //                    }
 //                }
     }
-    // Virgil notes: just copied this function, bc had to do with statusBarManager https://stackoverflow.com/questions/59464159/ios-13-get-wifi-and-cellular-network-signal-strength
+    // Virgil notes:  just copied this function, bc had to do with statusBarManager https://stackoverflow.com/questions/59464159/ios-13-get-wifi-and-cellular-network-signal-strength
     class func signalStrength() -> Double {
         if #available(iOS 13.0, *) {
             if let statusBarManager = UIApplication.shared.keyWindow?.windowScene?.statusBarManager,

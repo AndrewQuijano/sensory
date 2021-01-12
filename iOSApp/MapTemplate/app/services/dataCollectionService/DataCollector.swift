@@ -21,7 +21,8 @@ class DataCollector: NSObject {
   var baseAltitude: CMAltitudeData?
   var shouldSetBaseAltitude = false
   static let motionManager = CMMotionManager()
-    // Virgil notes: four variables below are based on the Faulkner github of features
+    // Virgil notes:
+    // four variables below are based on the Faulkner github of features
     var city: String?
     var country: String?
   var avgFloors = ["0-2", "3-5", "6-10", "10-20", "20-50", "50+"]
@@ -154,7 +155,8 @@ class DataCollector: NSObject {
     //clear the dataQ in preparation for uploading
     let tempData = local.dataQueue
 
-    // Virgil notes: this is how magneto works
+    // Virgil notes:
+    // this is how magneto works
     // cmmotionManager has a bunch of methods and to get data you use updates
     // tutorial: https://developer.apple.com/documentation/coremotion/cmmotionmanager
     motionManager.startMagnetometerUpdates()
@@ -188,7 +190,8 @@ class DataCollector: NSObject {
     
   //MARK: - Parsing
   func generateDatapointFrom(_ altitudeData: CMAltitudeData?, location: CLLocation?, accelData: CMAccelerometerData?) -> [String : AnyObject]? {
-    // Virgil notes : This is where data is organized to be sent over request
+    // Virgil notes :
+    // This is where data is organized to be sent over request
     // making the total_magnet, country, and city features was a bit screwy
     // total magnet calculation had to do with AnyObject type conversion problems
     // also rssi_strength has it's own function in locomotion file in motionService
