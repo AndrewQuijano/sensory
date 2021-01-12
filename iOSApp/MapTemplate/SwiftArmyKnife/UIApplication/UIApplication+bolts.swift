@@ -13,7 +13,7 @@ public extension UIApplication {
 
     class func _jumpToSettings() {
         if let appSettings = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.openURL(appSettings as URL)
+            UIApplication.shared.open(appSettings as URL, options: [:], completionHandler: nil)
         }
     }
 }

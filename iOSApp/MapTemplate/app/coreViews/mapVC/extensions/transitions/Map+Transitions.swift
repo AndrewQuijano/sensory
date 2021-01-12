@@ -10,7 +10,11 @@ import Foundation
 
 @available(iOS 10.0, *)
 extension MapViewController {
-  
+  // This is where Map storyboard connects to other storyboards
+    // This is where you would add showCollectorVC;
+    // Unfortunately it doesn't have simple CollectorViewController to make new instance out of
+    // You will have to look into UITabBar, look at first collector storyboard you'll see
+    // *don't forget to import UIKit 
   func showAddressbook() {
     let vc = AddressbookViewController._newInstance() as! AddressbookViewController
     addressbookVC = vc

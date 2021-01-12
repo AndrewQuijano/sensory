@@ -16,7 +16,7 @@ public extension URL {
         
         if let components = query?.components(separatedBy: "&") {
             for comp in components {
-                var sub = comp.components(separatedBy: "=")
+                let sub = comp.components(separatedBy: "=")
                 dict.setObject(sub[1], forKey: sub[0] as NSCopying)
             }
         }

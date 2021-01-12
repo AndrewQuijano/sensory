@@ -10,7 +10,12 @@ import UIKit
 import CoreLocation
 import CoreMotion
 import CoreData
+// Virgil Notes:
 
+// This is meat and potatoes of data collection
+// All of the UITableViewCell might need their own file and class set up
+// This is helpful link I was using: https://www.youtube.com/watch?v=FtO5QT2D_H8
+// You may need to reconnect IBOutlets and make sure properties are set correctly
 class Collector: UITableViewController, UITextFieldDelegate {
     
     @IBOutlet weak var rssiStrengthCell: UITableViewCell!
@@ -73,7 +78,7 @@ class Collector: UITableViewController, UITextFieldDelegate {
         self.cityNameTextField.delegate = self
         self.countryNameTextField.delegate = self
         self.envDescriptionTextField.delegate = self
-        SSID.fetchSSIDInfo()
+//        SSID.fetchSSIDInfo()
     }
     
     
@@ -277,7 +282,7 @@ class Collector: UITableViewController, UITextFieldDelegate {
             let header = colNames.joined(separator: ",") + "\n"
             var data = header
             
-            for var dp in self.dataPoints {
+            for dp in self.dataPoints {
                 var vals: [String] = []
                 for key in colNames {
                     vals.append("\(dp[key]!)")

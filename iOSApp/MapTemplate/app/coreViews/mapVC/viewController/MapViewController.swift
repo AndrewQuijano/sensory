@@ -8,7 +8,8 @@
 
 import UIKit
 import MapKit
-
+// Main View Controller essentially; transitions to other storyboards is in
+// mapVC/extentions/transitions/Map+Transitions.swift (where functions come from)
 @available(iOS 10.0, *)
 class MapViewController: BaseViewController {
   
@@ -34,7 +35,6 @@ class MapViewController: BaseViewController {
   var addressbookVC: AddressbookViewController?
   var address = Address(context: AppDelegate.MOC())
   var unsentDatapoints : [NSDictionary] = []
-  
   
   //MARK: - View Lifecycle
   override func viewDidLoad() {

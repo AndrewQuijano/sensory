@@ -21,6 +21,8 @@ class DataCollector: NSObject {
   var baseAltitude: CMAltitudeData?
   var shouldSetBaseAltitude = false
   static let motionManager = CMMotionManager()
+    // Virgil notes:
+    // four variables below are based on the Faulkner github of features
     var city: String?
     var country: String?
   var avgFloors = ["0-2", "3-5", "6-10", "10-20", "20-50", "50+"]
@@ -121,7 +123,9 @@ class DataCollector: NSObject {
   
   
   class func predictLocation(_ onSuccess:@escaping ((_ floor: Double) -> ()), onFailure:@escaping ((_ error: NSError) -> ())) {
-    
+    // Virgil notes:
+    // this class function is what is sending data over alamofire requests
+    // Ignore train request, only predict gets called
     let local = DataCollector.sharedInstace
 //    print("sharedInstace")
 //    print(sharedInstace)
@@ -150,14 +154,13 @@ class DataCollector: NSObject {
 //        }
     //clear the dataQ in preparation for uploading
     let tempData = local.dataQueue
-//    print("check local.DataQueue")
-//    print(local.dataQueue)
-    
+
+    // Virgil notes:
+    // this is how magneto works
+    // cmmotionManager has a bunch of methods and to get data you use updates
+    // tutorial: https://developer.apple.com/documentation/coremotion/cmmotionmanager
     motionManager.startMagnetometerUpdates()
-//    print("datacollector magnets")
-//    print("x",motionManager.magnetometerData?.magneticField.x)
-//    print("y",motionManager.magnetometerData?.magneticField.y)
-//    print("z",motionManager.magnetometerData?.magneticField.z)
+
     
     local.dataQueue.removeAll()
     
@@ -187,7 +190,11 @@ class DataCollector: NSObject {
     
   //MARK: - Parsing
   func generateDatapointFrom(_ altitudeData: CMAltitudeData?, location: CLLocation?, accelData: CMAccelerometerData?) -> [String : AnyObject]? {
-  
+    // Virgil notes :
+    // This is where data is organized to be sent over request
+    // making the total_magnet, country, and city features was a bit screwy
+    // total magnet calculation had to do with AnyObject type conversion problems
+    // also rssi_strength has it's own function in locomotion file in motionService
     if let altitudeData = altitudeData, let location = location {
         var dp : [String: AnyObject] = [
         "created_at": Date()._UTCTimestamp() as AnyObject,
@@ -215,7 +222,7 @@ class DataCollector: NSObject {
             "env_activity": self.activities[0] as AnyObject,
             "indoors": 0 as AnyObject
         ];
-//      print(dp)
+
         let x = dp["magnet_x_mt"] as! Double
         let y = dp["magnet_y_mt"] as! Double
         let z = dp["magnet_z_mt"] as! Double
@@ -236,7 +243,6 @@ class DataCollector: NSObject {
         
         dp["city_name"] = self.city?.lowercased() as AnyObject
         dp["country_name"] = self.country?.lowercased() as AnyObject
-        print(dp)
         return dp
     }
     return nil
