@@ -10,4 +10,10 @@
     <string name="activity_tilting">activity_tilting</string>
     <string name="activity_walking">activity_walking</string>
     <string name="Confidence">confidence</string>
+    <string name="indoors">Indoors</string>
+    <string name="start">Start</string>
+    <string name="room">Room</string>
+    <string name="building">Building</string>
+    <string name="env_context">env_context</string>
+    <string name="center">Center</string>
 </resources>
