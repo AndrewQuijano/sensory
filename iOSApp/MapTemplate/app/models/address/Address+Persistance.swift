@@ -12,7 +12,7 @@ import CoreData
 extension Address {
   
   override var description: String {
-    super.description
+//    super.description
     var result = "\(streetAddress!)"
     
     if let apartment = apartment {

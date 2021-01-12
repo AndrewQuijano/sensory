@@ -115,9 +115,9 @@ class PlotViewController: UIViewController {
               
             case "gps_longitude":
               dp["longitude"] = Double(val)! as AnyObject?
-              
-            case "gps_longitude":
-              dp["gps_alt"] = Double(val)! as AnyObject?
+              // uncomment if something breaks
+//            case "gps_longitude":
+//              dp["gps_alt"] = Double(val)! as AnyObject?
               
             case "created_at":
               dp[col] = val as AnyObject?

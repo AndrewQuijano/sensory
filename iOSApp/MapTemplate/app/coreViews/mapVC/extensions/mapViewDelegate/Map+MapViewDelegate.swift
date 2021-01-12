@@ -16,7 +16,8 @@ extension MapViewController: MKMapViewDelegate {
     updateAddressFromLoc()
     predictAddressIfNeeded()
   }
-  
+  // Virgil notes: This is where predictLocation is called from Data Colector
+    // this is where data collection starts essentially with this function
   func predictAddressIfNeeded() {
     if isMapCenterOnUser() {
         DataCollector.predictLocation({(floor) in

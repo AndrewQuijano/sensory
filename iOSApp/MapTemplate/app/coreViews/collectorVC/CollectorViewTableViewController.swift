@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 import MessageUI
-
+// Virgil Notes: This viewcontroller uses plotViewController
 class CollectorViewTableViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
     var data : [Session] = []

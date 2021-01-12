@@ -145,8 +145,8 @@ public extension UIView {
     ///Removes swift class identifiers and returns clean class name
     class func _className() -> String {
         
-        print(NSStringFromClass(self as! AnyClass).components(separatedBy:"."))
-        return NSStringFromClass(self as! AnyClass).components(separatedBy:".")[1] as String
+        print(NSStringFromClass((self as AnyClass)).components(separatedBy:"."))
+        return NSStringFromClass((self as AnyClass)).components(separatedBy:".")[1] as String
     }
 }
 

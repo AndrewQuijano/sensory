@@ -42,7 +42,7 @@ class ContactViewController: BaseViewController {
   
   @IBAction func callButtonPressed(_ sender: UIButton) {
     let url = URL(string: "tel://911")!
-    UIApplication.shared.openURL(url)
+    UIApplication.shared.open(url, completionHandler: nil)
   }
   
   @IBAction func textButtonPressed(_ sender: UIButton) {

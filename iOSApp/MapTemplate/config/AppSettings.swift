@@ -14,7 +14,7 @@ class AppSettings: NSObject {
     
     
 //    return "http://10.25.1.20:5000"
-    return "<YOU IP ADDRESS HERE>"
+    return "<IP-ADDRESS>"
     //return "http://plinr.com/911"
 //    return "http://192.168.1.129:5000"
 //    return "http://160.39.250.64:5000"

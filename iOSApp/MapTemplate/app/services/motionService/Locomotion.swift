@@ -29,14 +29,14 @@ class Locomotion: NSObject {
     
     class func streamAccelerometerUpdates(_ onMotion: @escaping CMAccelerometerHandler) {
         
-        print("HIIIIIIIIIIII")
-        print("stream accelerometer")
+//        print("HIIIIIIIIIIII")
+//        print("stream accelerometer")
         let motionManager = Locomotion.sharedInstance.motionManager!
 //        print(motionManager.magnetometerData)
         motionManager.magnetometerUpdateInterval = 1.0
         motionManager.startMagnetometerUpdates()
-        print("magneettttts")
-        print(motionManager.magnetometerData)
+//        print("magneettttts")
+//        print(motionManager.magnetometerData)
         motionManager.accelerometerUpdateInterval = 1.0
         motionManager.startAccelerometerUpdates(to: OperationQueue.main, withHandler: onMotion)
 
@@ -63,7 +63,7 @@ class Locomotion: NSObject {
 //                    }
 //                }
     }
-    // https://stackoverflow.com/questions/59464159/ios-13-get-wifi-and-cellular-network-signal-strength
+    // Virgil notes: just copied this function, bc had to do with statusBarManager https://stackoverflow.com/questions/59464159/ios-13-get-wifi-and-cellular-network-signal-strength
     class func signalStrength() -> Double {
         if #available(iOS 13.0, *) {
             if let statusBarManager = UIApplication.shared.keyWindow?.windowScene?.statusBarManager,
@@ -99,7 +99,7 @@ class Locomotion: NSObject {
                 return Double(signalStrength)
             }
         }
-        return 0
+//        return 0
     }
     
     class func streamBarometerData(_ onData: @escaping CMAltitudeHandler) {

@@ -21,7 +21,7 @@ public extension Set {
             i = self.count - abs(index)
         }
         
-        var array = _allObjects
+        let array = _allObjects
         
         //return the requested item
         return array[i]

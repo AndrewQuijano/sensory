@@ -34,7 +34,7 @@ public extension NSManagedObjectContext {
   /**
    Enables in memory creation of managedObjects without hitting app persistent store
    */
-  public class func _inMemoryManagedObjectContext() -> NSManagedObjectContext {
+  class func _inMemoryManagedObjectContext() -> NSManagedObjectContext {
     let managedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
     
     let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
