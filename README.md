@@ -1,12 +1,40 @@
 # sensory
-This repository contains the Swift 5 version of William Falcon's sensory iOS app. Also, it contains its Android counterpart which can collect the same features as sensory. Also, the Android version can collect Wi-Fi Access Point MAC address and their corresponding RSSI signals for indoor localization.
+This repository contains the Swift 5 version of William Falcon's sensory iOS app.  
+
+Also, it contains its Android counterpart which can collect the same features as sensory. The Android version can collect Wi-Fi Access Point MAC address and their corresponding RSSI signals for indoor localization.
 
 The server code for both data collection and processing is located in this repository:
-https://github.com/AndrewQuijano/ColumbiaREU2018.git  
+https://github.com/AndrewQuijano/Room_Level_Localization_Server.git  
 
 ## Installation
+** Prerequisites
+This guide will assume you have MySQL installed on your server and you completed any necessary port forwarding for the server to collect the data. Also, it requires the following python packages:  
+
+pandas  
+sqlalchemy  
+configparser  
+flask  
+pymsql
+
 ** iOS Installation
-Note this was tested on Xcode 11. 
+This was sucessfully tested on the following versions of XCode and iPhones
+
+XCode 11.3 -> iPhone 7 with iOS 12.3  
+Xcode 12.3 -> iPhone 12 with iOS 14.3  
+
+1. You need to set the IP Address of where the server will collect sensory's data. 
+Edit the file:
+iOSApp/MapTemplate/config/AppSettings.swift  
+Replace <YOUR IP HERE> with **https://<SERVER-IP>:<PORT-NUMBER>**
+
+2. Open Xcode, and open the iOS/911.xcworkspace file. Opening this file ensures all the cocoapods are loaded as expected.
+
+3. Connect to your developer account. (This requires $99/year to Apple for personal account).  
+* Go to Xcode -> Preferences  
+* Sign in with your Apple ID that is a Developer Account  
+* Click Manage Certificates, ensure you have your developer certificates installed
+* Open 911.xcodeproj and go to Signing Capabilities tab for each entry and input yor developer account.
+* Have XCode set the install target to be your phone and you will have sensory on your iOS device!  
 
 ** Android Installation
 Please note the Android installation has only been tested on Samsung Galaxy 3. But it should work with all other Android devices.
@@ -16,7 +44,7 @@ https://developer.android.com/training/basics/firstapp/running-app
 
 
 ## Usage
-The application will open a world map and zoom in on your GPS coordinates. It will make a guess in which address you are located in.
+The application will open a world map and zoom in on your GPS coordinates. It will make a guess in which address you are located in the [Main Menu](https://github.com/AndrewQuijano/sensory/blob/master/images/main_menu.jpg)
 
 At this point it will also every second send the sensor information to the designated server. 
 
@@ -36,11 +64,11 @@ Falcon, William, and Henning Schulzrinne. "Predicting Floor-Level for 911 Calls 
 
 ## Project status
 Currently the following issues need to resolved
-* The Android version of sensory is still in progress of being refactored
-* iOS sensory does not have a magnetometer
 * iOS sensory can't collect Wi-Fi MAC Addresses and RSSI signal strength. This may prove to be near impossible as Apple have no equivalent to Wi-Fi manager class as in Android?
-* Documentation needs improvement as well.
-
-This should be taken care of during the Winter break in December before Spring 2021 semester.
-
+* Documentation needs improvement.
+* Henning requested to investigate if sensory rssi feature is obtained from Wi-Fi or cell tower. Ensure rssi is from Wi-Fi and record in each row the MAC address of the AP.
+* Henning requested to get the barometric pressure at sea level alongside the measurement from the sensors.
+* Henning requested that I be able to label when the scan was at the walls or center of a room.
+* CURRENT TASK: Push sensory v1 Android version once I get the timer task working. 
+* CURRENT TASK: Have server.py run the predictdb.sql code for automatic scheme and table creation.
 

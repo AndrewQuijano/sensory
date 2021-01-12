@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=41:4B:8B:1D:88:86:01:AB:FE:67:51:1D:EA:A9:CE:1B:DF:7A:02:83%3Bcolumbia.irt.sensory
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    columbia.irt.sensory
+
+    SHA-1 certificate fingerprint:
+    41:4B:8B:1D:88:86:01:AB:FE:67:51:1D:EA:A9:CE:1B:DF:7A:02:83
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBYJbhGFl17ejbVxeiqlcoSk2epVB3ALd0</string>
+</resources>
