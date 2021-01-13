@@ -4,10 +4,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,17 +59,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Timer tick = new Timer();
     private TimerTask timerTask;
 
+    Button collection;
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null)
         {
             mapFragment.getMapAsync(this);
         }
+
+        collection = findViewById(R.id.collect);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -75,6 +82,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Manifest.permission.ACCESS_COARSE_LOCATION
                     }, 1001);
         }
+
+        collection.setOnClickListener(new collect());
 
         // Build Sensors
         SensorManager my_SensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -87,6 +96,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gps = new GPSAltimeter(this);
         barometer = new BarometricAltimeter(my_SensorManager, gps);
         motion = new MotionReceiver(this);
+    }
+
+    private class collect implements View.OnClickListener
+    {
+        public void onClick(View v)
+        {
+            // Set to other fragment
+            // Fragment
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.flayout, new CollectionFragment(), null);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
     }
 
     /**
@@ -181,7 +204,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private class collect extends TimerTask implements CompoundButton.OnCheckedChangeListener
+    private class start extends TimerTask implements CompoundButton.OnCheckedChangeListener
     {
         public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked)
         {
@@ -197,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if (timerTask == null)
                 {
-                    timerTask = new collect();
+                    timerTask = new start();
                 }
                 // Put here time 1,000 milliseconds = 1 second
                 tick.schedule(timerTask, 0, 1000 * sampling_rate);
