@@ -122,7 +122,7 @@ public class getAccessPoint implements Runnable
 				System.out.println("Manufacturer: " + i + " Company: " + Makers[i]);
 				Thread.sleep(1200);//No API 1 request a second, add .2 as as slack
 			}
-			dataCollection.printHashMap(Maker_freq);
+			//sdataCollection.printHashMap(Maker_freq);
 		}
 		catch (ClassNotFoundException e) 
 		{

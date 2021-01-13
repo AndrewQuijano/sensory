@@ -114,44 +114,48 @@ public class dataCollection implements Runnable
 			String SQL = "insert into " + DB + "." + TRAININGDATA + " "
 					+ "values "
 					+ "(?, "				// Primary Key
-					+ "?, ?, ?, ?, ?, "   	// 5 GPS and Pressure
-					+ "?, ?, "				// 2 Location Accuracy
-					+ "?, ?, ?, ?, ?, "		// 5 Environment
-					+ "?, ?, ?, ?, "		// 4 Magnetic Field
-					+ "?, ?, ?, ?, ?, ?,"	// 6 Misc
-					+ "?, ?, ?, ?, ?"		// 4 Phone Features and current weather...
+					+ "?, ?, ?, ?, ?, "   	// 5 Classes
+					+ "?, ?, ?, ?, ?, ? "	// 6 GPS
+					+ "?, ?, "				// 2 barometric
+					+ "?, ?, ?, ?, ?, "		// 5 env features
+					+ "?, ?, ?, ?, "		// 4 Magnetic field
 					+ ");";
 
 			// Fill up Regular Dataset based on sensory
 			insert = conn.prepareStatement(SQL);
 
-			// Fill up Indoors/Created At/Device ID/Floor/RSSI
+			// (5) Fill up Indoors/Created At/Device ID/Floor/RSSI
 			insert.setInt(1, input.getIndoors());
-			insert.setDouble(2, input.longitude);
-			insert.setDouble(3, input.latitude);
-			insert.setDouble(4, input.altitude);
-			insert.setDouble(5, input.barometric_Altitude);
-			insert.setDouble(6, input.sea_level_pressure);
-
-			// Fill up GPS
-			insert.setDouble(7, input.hAccuracy);
-			insert.setDouble(8, input.vAccuracy);
-
-			// Fill up Magnetic Field
-			insert.setDouble(14, input.magnetX);
-			insert.setDouble(15, input.magnetY);
-			insert.setDouble(16, input.magnetZ);
-			insert.setDouble(17, input.totalMagnet);	
-
-			// Misc
-			insert.setTimestamp(18, date);
-			insert.setString(19, 	input.floor);
-			insert.setString(20,    input.Room);
-			insert.setString(21,    input.Building);
-			insert.setInt(22,       input.position);
-			insert.setString(23, 	input.Phone);
+			insert.setString(2, input.created_at());
+			insert.setString(3, input.created_at());
+			insert.setString(4, input.floor());
+			insert.setInt(5, input.rssi_strength());
 			
+			// (6) Fill up GPS
+			insert.setDouble(6, input.gps_longitude());
+			insert.setDouble(7, input.gps_latitude());
+			insert.setDouble(8, input.gps_vertical_accuracy());
+			insert.setDouble(9, input.gps_horizontal_accuracy());
+			insert.setDouble(10, input.gps_course());
+			insert.setDouble(11, input.gps_speed());
 			
+			// (2) Barometric
+			insert.setDouble(12, input.barometric_pressure());
+			insert.setDouble(13, input.barometric_relative_altitude());
+			
+			// (5) Environment
+			insert.setString(14, input.environment_context());
+			insert.setString(15, input.environment_context());
+			insert.setString(16, input.environment_mean_bldg_floors());
+			insert.setString(17, input.city_name());
+			insert.setString(18, input.country_name());
+
+			// (4) Fill up Magnetic Field
+			insert.setDouble(19, input.magnet_x_mt());
+			insert.setDouble(20, input.magnet_y_mt());
+			insert.setDouble(21, input.magnet_z_mt());
+			insert.setDouble(22, input.magnet_total());	
+
 			//Execute and Close SQL Command
 			insert.execute();
 			
