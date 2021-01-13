@@ -16,4 +16,7 @@
     <string name="building">Building</string>
     <string name="env_context">env_context</string>
     <string name="center">Center</string>
+    <string name="collection_settings">Collection Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

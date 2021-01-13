@@ -8,6 +8,7 @@ import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.CompoundButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,8 +17,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import columbia.irt.motion.MotionReceiver;
-import columbia.irt.sensors.AudioSensor;
 import columbia.irt.sensors.BarometricAltimeter;
 import columbia.irt.sensors.BluetoothReceiver;
 import columbia.irt.sensors.GPSAltimeter;
@@ -25,14 +33,11 @@ import columbia.irt.sensors.HumiditySensor;
 import columbia.irt.sensors.LightSensor;
 import columbia.irt.sensors.MagneticFieldSensor;
 import columbia.irt.sensors.TemperatureSensor;
-import columbia.irt.sensors.WifiReceiver;
+import columbia.irt.struct.FloorData;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
-    private GoogleMap mMap;
-
     // Sensor Classes
-    private WifiReceiver wifiReceiver;
     private BluetoothReceiver blueWrapper;
     private BarometricAltimeter barometer;
     private LightSensor light;
@@ -40,8 +45,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private HumiditySensor humid;
     private GPSAltimeter gps;
     private MagneticFieldSensor magneto;
-    private AudioSensor audio;
     private MotionReceiver motion;
+
+    // IP data
+    public final static String SQLDatabase = "160.39.151.251";
+    public final static int portNumber = 9000;
+
+    // Timer stuff
+    private Timer tick = new Timer();
+    private TimerTask timerTask;
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -50,7 +62,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null)
+        {
+            mapFragment.getMapAsync(this);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -64,14 +79,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Build Sensors
         SensorManager my_SensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         blueWrapper = new BluetoothReceiver(this);
-        wifiReceiver = new WifiReceiver(this);
         motion = new MotionReceiver(this);
         light = new LightSensor(my_SensorManager);
         temp = new TemperatureSensor(my_SensorManager);
         humid = new HumiditySensor(my_SensorManager);
         magneto = new MagneticFieldSensor(my_SensorManager);
         gps = new GPSAltimeter(this);
-        audio = new AudioSensor();
         barometer = new BarometricAltimeter(my_SensorManager, gps);
         motion = new MotionReceiver(this);
     }
@@ -88,17 +101,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void onMapReady(GoogleMap googleMap)
     {
-        mMap = googleMap;
         // Add a marker in Sydney and move the camera
         LatLng current = new LatLng(gps.latitude, gps.longitude);
-        mMap.addMarker(new MarkerOptions().position(current).title("Marker"));
+        googleMap.addMarker(new MarkerOptions().position(current).title("Marker"));
 
         // Move in with Camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
         // Zoom in, animating the camera.
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        googleMap.animateCamera(CameraUpdateFactory.zoomIn());
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
     }
 
     protected void onStart()
@@ -165,6 +177,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(blueWrapper != null)
         {
             blueWrapper.unregisterReceiver(this);
+        }
+    }
+
+
+    private class collect extends TimerTask implements CompoundButton.OnCheckedChangeListener
+    {
+        public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked)
+        {
+            // 1 scan per second
+            int sampling_rate = 1;
+
+            if (isChecked)
+            {
+                // Get data from sensors
+                if (tick == null)
+                {
+                    tick = new Timer();
+                }
+                if (timerTask == null)
+                {
+                    timerTask = new collect();
+                }
+                // Put here time 1,000 milliseconds = 1 second
+                tick.schedule(timerTask, 0, 1000 * sampling_rate);
+            }
+        }
+
+        public void run()
+        {
+            try
+            {
+                // I/O
+                Socket clientSocket = new Socket();
+                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 10 * 1000);
+
+                FloorData f = new FloorData(1, "created", "device",
+                "floor",-100,
+                gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
+                barometer.barometricAltitude, barometer.pressure,
+                "context", "mean_floors", "activity",
+                gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
+
+                // Send Data
+                ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
+                toServer.writeObject(f);
+                //toServer.writeObject(null);
+
+                toServer.close();
+                if(clientSocket.isConnected())
+                {
+                    clientSocket.close();
+                }
+            }
+            catch(SocketTimeoutException ioe)
+            {
+                ioe.printStackTrace();
+            }
+            catch(IOException ioe)
+            {
+                ioe.printStackTrace();
+            }
         }
     }
 }

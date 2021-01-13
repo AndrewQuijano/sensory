@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity">
+
+    <!-- Additional Classes for sensory v2.0 -->
+
+    <Switch
+        android:id="@+id/switch5"
+        android:layout_width="105dp"
+        android:layout_height="41dp"
+        android:text="@string/indoors"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
+        android:id="@+id/start"
+        android:layout_width="87dp"
+        android:layout_height="46dp"
+        android:text="@string/start"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
+        android:id="@+id/center"
+        android:layout_width="98dp"
+        android:layout_height="45dp"
+        android:text="@string/center"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <EditText
+        android:id="@+id/env_context"
+        android:layout_width="374dp"
+        android:layout_height="51dp"
+        android:autofillHints="env_context"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/env_context"
+
+        />
+
+    <NumberPicker
+        android:id="@+id/floor"
+        android:layout_width="59dp"
+        android:layout_height="41dp" />
+
+    <EditText
+        android:id="@+id/room"
+        android:layout_width="368dp"
+        android:layout_height="45dp"
+        android:autofillHints="Room Name"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/room" />
+
+    <EditText
+        android:id="@+id/building"
+        android:layout_width="367dp"
+        android:layout_height="52dp"
+        android:autofillHints="Building Name"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/building" />
+</LinearLayout>
