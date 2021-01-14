@@ -8,6 +8,7 @@ import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -130,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         "context", "mean_floors", "activity",
                         gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
 
+                Log.d("HELLO", f.toString());
                 // Send Data
                 ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
                 toServer.writeObject(f);

@@ -1,31 +1,35 @@
-package columbia.irt.network.structs;
+package columbia.irt.struct;
 
-public class FloorData
+import java.io.Serializable;
+
+public class FloorData implements Serializable
 {
+	private static final long serialVersionUID = 5376412116682569286L;
+	
 	// 1 - indoors 0 - outdoors
-	private int indoors;
+	private final int indoors;
 	// Time of scan
-	private String created_at;
+	private final String created_at;
 	// Time scan started, but oops got device ID though
-	private String session_id;
-	private String floor;
-	private int rssi_strength;
-	private double gps_latitude;
-	private double gps_longitude;
-	private double gps_vertical_accuracy;
-	private double gps_horizontal_accuracy;
-	private double gps_course;
-	private double gps_speed;
-	private double barometric_relative_altitude;
-	private double barometric_pressure;
-	private String environment_context;
-	private String environment_mean_bldg_floors;
-	private String environment_activity;
-	private String city_name;
-	private String country_name;
-	private double magnet_x_mt;
-	private double magnet_y_mt;
-	private double magnet_z_mt;
+	private final String session_id;
+	private final String floor;
+	private final int rssi_strength;
+	private final double gps_latitude;
+	private final double gps_longitude;
+	private final double gps_vertical_accuracy;
+	private final double gps_horizontal_accuracy;
+	private final double gps_course;
+	private final double gps_speed;
+	private final double barometric_relative_altitude;
+	private final double barometric_pressure;
+	private final String environment_context;
+	private final String environment_mean_bldg_floors;
+	private final String environment_activity;
+	private final String city_name;
+	private final String country_name;
+	private final double magnet_x_mt;
+	private final double magnet_y_mt;
+	private final double magnet_z_mt;
 	private double magnet_total;
 
 	// Fill data from sensors
@@ -176,5 +180,55 @@ public class FloorData
 	public double magnet_total()
 	{
 		return this.magnet_total;
+	}
+
+	public String toString()
+	{
+		StringBuilder result = new StringBuilder();
+		result.append(this.getIndoors());
+		result.append(',');
+		result.append(this.created_at());
+		result.append(',');
+		result.append(this.session_id());
+		result.append(',');
+		result.append(this.floor());
+		result.append(',');
+		result.append(this.rssi_strength());
+		result.append(',');
+		result.append(this.gps_latitude());
+		result.append(',');
+		result.append(this.gps_longitude());
+		result.append(',');
+		result.append(this.gps_vertical_accuracy());
+		result.append(',');
+		result.append(this.gps_horizontal_accuracy());
+		result.append(',');
+		result.append(this.gps_course());
+		result.append(',');
+		result.append(this.gps_speed());
+		result.append(',');
+		result.append(this.barometric_relative_altitude());
+		result.append(',');
+		result.append(this.barometric_pressure());
+		result.append(',');
+		result.append(this.environment_context());
+		result.append(',');
+		result.append(this.environment_mean_bldg_floors());
+		result.append(',');
+		result.append(this.environment_activity());
+		result.append(',');
+		result.append(this.city_name());
+		result.append(',');
+		result.append(this.country_name());
+		result.append(',');
+		result.append(this.magnet_x_mt());
+		result.append(',');
+		result.append(this.magnet_y_mt());
+		result.append(',');
+		result.append(this.magnet_z_mt());
+		result.append(',');
+		result.append(this.magnet_total());
+		result.append(',');
+		return result.toString();
 	}
 }

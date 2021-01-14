@@ -1,7 +1,11 @@
 package columbia.irt.struct;
 
-public class FloorData
+import java.io.Serializable;
+
+public class FloorData implements Serializable
 {
+	private static final long serialVersionUID = 5376412116682569286L;
+
 	// 1 - indoors 0 - outdoors
 	private final int indoors;
 	// Time of scan

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import android.net.wifi.ScanResult;
-import columbia.irt.network.structs.FloorData;
+import columbia.irt.struct.FloorData;
 
 
 public class dataCollection implements Runnable
