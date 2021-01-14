@@ -14,6 +14,7 @@ public class FloorData implements Serializable
 	private final String session_id;
 	private final String floor;
 	private final int rssi_strength;
+	private final double gps_alt;
 	private final double gps_latitude;
 	private final double gps_longitude;
 	private final double gps_vertical_accuracy;
@@ -35,7 +36,7 @@ public class FloorData implements Serializable
 	// Fill data from sensors
 	public FloorData(
 			int indoors, String created_at, String session_id,
-			String floor, int rssi_strength, double gps_latitude, 
+			String floor, int rssi_strength, double gps_alt, double gps_latitude, 
 			double gps_longitude, double gps_vertical_accuracy, double gps_horizontal_accuracy,
 			double gps_course, double gps_speed, double barometric_relative_altitude,
 			double barometric_pressure, String environment_context, String environment_mean_bldg_floors,
@@ -49,6 +50,7 @@ public class FloorData implements Serializable
 		this.session_id = session_id; //Oops, got device ID
 		this.floor = floor;
 		this.rssi_strength = rssi_strength;
+		this.gps_alt = gps_alt;
 		this.gps_latitude = gps_latitude;
 		this.gps_longitude = gps_longitude;
 		this.gps_vertical_accuracy = gps_vertical_accuracy;
@@ -95,6 +97,11 @@ public class FloorData implements Serializable
 	public int rssi_strength()
 	{
 		return this.rssi_strength;
+	}
+	
+	public double gps_alt()
+	{
+		return this.gps_alt;
 	}
 	
 	public double gps_latitude()

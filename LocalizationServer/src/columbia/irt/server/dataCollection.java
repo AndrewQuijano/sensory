@@ -67,6 +67,7 @@ public class dataCollection implements Runnable
 			{
 				boolean result = submitTrainingData((FloorData) x);
 				toClient.writeBoolean(result);
+				toClient.flush();
 			}
 
 			//Close I/O streams and Socket
@@ -106,12 +107,12 @@ public class dataCollection implements Runnable
 			
 			String SQL = "insert into " + DB + "." + TRAININGDATA + " "
 					+ "values "
-					+ "(?, "				// Primary Key
-					+ "?, ?, ?, ?, ?, "   	// 5 Classes
-					+ "?, ?, ?, ?, ?, ? "	// 6 GPS
-					+ "?, ?, "				// 2 barometric
-					+ "?, ?, ?, ?, ?, "		// 5 env features
-					+ "?, ?, ?, ?, "		// 4 Magnetic field
+					+ "(default, "				// Primary Key, already done for you!
+					+ "?, ?, ?, ?, ?, "   		// 5 Classes
+					+ "?, ?, ?, ?, ?, ?, ?, "	// 7 GPS
+					+ "?, ?, "					// 2 barometric
+					+ "?, ?, ?, ?, ?, "			// 5 env features
+					+ "?, ?, ?, ? "				// 4 Magnetic field
 					+ ");";
 
 			// Fill up Regular Dataset based on sensory
@@ -120,34 +121,35 @@ public class dataCollection implements Runnable
 			// (5) Fill up Indoors/Created At/Device ID/Floor/RSSI
 			insert.setInt(1, input.getIndoors());
 			insert.setString(2, input.created_at());
-			insert.setString(3, input.created_at());
-			insert.setString(4, input.floor());
+			insert.setString(3, input.session_id());
+			insert.setInt(4, Integer.parseInt(input.floor()));
 			insert.setInt(5, input.rssi_strength());
 			
 			// (6) Fill up GPS
-			insert.setDouble(6, input.gps_longitude());
-			insert.setDouble(7, input.gps_latitude());
-			insert.setDouble(8, input.gps_vertical_accuracy());
-			insert.setDouble(9, input.gps_horizontal_accuracy());
-			insert.setDouble(10, input.gps_course());
-			insert.setDouble(11, input.gps_speed());
+			insert.setDouble(6, input.gps_alt());
+			insert.setDouble(7, input.gps_longitude());
+			insert.setDouble(8, input.gps_latitude());
+			insert.setDouble(9, input.gps_vertical_accuracy());
+			insert.setDouble(10, input.gps_horizontal_accuracy());
+			insert.setDouble(11, input.gps_course());
+			insert.setDouble(12, input.gps_speed());
 			
 			// (2) Barometric
-			insert.setDouble(12, input.barometric_pressure());
-			insert.setDouble(13, input.barometric_relative_altitude());
+			insert.setDouble(13, input.barometric_pressure());
+			insert.setDouble(14, input.barometric_relative_altitude());
 			
 			// (5) Environment
-			insert.setString(14, input.environment_context());
 			insert.setString(15, input.environment_context());
-			insert.setString(16, input.environment_mean_bldg_floors());
-			insert.setString(17, input.city_name());
-			insert.setString(18, input.country_name());
+			insert.setString(16, input.environment_context());
+			insert.setString(17, input.environment_mean_bldg_floors());
+			insert.setString(18, input.city_name());
+			insert.setString(19, input.country_name());
 
 			// (4) Fill up Magnetic Field
-			insert.setDouble(19, input.magnet_x_mt());
-			insert.setDouble(20, input.magnet_y_mt());
-			insert.setDouble(21, input.magnet_z_mt());
-			insert.setDouble(22, input.magnet_total());	
+			insert.setDouble(20, input.magnet_x_mt());
+			insert.setDouble(21, input.magnet_y_mt());
+			insert.setDouble(22, input.magnet_z_mt());
+			insert.setDouble(23, input.magnet_total());	
 
 			//Execute and Close SQL Command
 			insert.execute();
@@ -227,44 +229,6 @@ public class dataCollection implements Runnable
 			
 			// Build Database...
 			stmt.execute("CREATE DATABASE IF NOT EXISTS " + DB);
-			
-			//===================BUILD TRAINING TABLE=================================
-			/*
-				CREATE TABLE fiu.dataset
-				(  
-				ScanID Integer not null,
-
-				Longitude Double not null, 
-				Latitude Double not null, 
-				Altitude Double not null, 
-				Baro_Altitude not null,
-
-				Horizontal Double not null, 
-				Vertical Double not null, 
-
-				luminosity Double not null, 
-				Humidity Double not null, 
-				Pressure Double not null, 
-				Temperature Double not null,
-				Audio Double not null,
-
-				MagnetX Double not null, 
-				MagnetY Double not null, 
-				MagnetZ Double not null, 
-				TotalMagnet Double not null,
-				currentTime DATETIME not null,
-
-				Floor Text not null,
-				Room Text,
-				Building Text,
-				Position Integer not null,
-				PhoneNumber Text,
-				OS Text not null,
-				Model Text not null,
-				Device Text not null,
-				Product Text not null
-				);
-			 */
 
 			String sqlTrain = "CREATE TABLE IF NOT EXISTS " + DB + "." + TRAININGDATA + "(" + 
 					"  `ID` int NOT NULL AUTO_INCREMENT, " + 
