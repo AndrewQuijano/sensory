@@ -4,8 +4,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -52,8 +50,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MotionReceiver motion;
 
     // IP data
-    public final static String SQLDatabase = "160.39.151.251";
-    public final static int portNumber = 9000;
+    public final static String SQLDatabase = "72.229.36.215";
+    public final static int portNumber = 9254;
 
     // Timer stuff
     private Timer tick = new Timer();
@@ -98,17 +96,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         motion = new MotionReceiver(this);
     }
 
-    private class collect implements View.OnClickListener
+    private class collect extends TimerTask implements View.OnClickListener
     {
         public void onClick(View v)
         {
-            // Set to other fragment
-            // Fragment
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.flayout, new CollectionFragment(), null);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            // 1 scan per second
+            int sampling_rate = 1;
+            // Get data from sensors
+            if (tick == null)
+            {
+                tick = new Timer();
+            }
+            if (timerTask == null)
+            {
+                timerTask = new collect();
+            }
+            // Put here time 1,000 milliseconds = 1 second
+            tick.schedule(timerTask, 0, 1000 * sampling_rate);
+        }
+
+        public void run()
+        {
+            try
+            {
+                // I/O
+                Socket clientSocket = new Socket();
+                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 10 * 1000);
+
+                FloorData f = new FloorData(1, "created", "device",
+                        "floor",-100,
+                        gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
+                        barometer.barometricAltitude, barometer.pressure,
+                        "context", "mean_floors", "activity",
+                        gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
+
+                // Send Data
+                ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
+                toServer.writeObject(f);
+                //toServer.writeObject(null);
+
+                toServer.close();
+                if(clientSocket.isConnected())
+                {
+                    clientSocket.close();
+                }
+            }
+            catch(SocketTimeoutException ioe)
+            {
+                ioe.printStackTrace();
+            }
+            catch(IOException ioe)
+            {
+                ioe.printStackTrace();
+            }
         }
     }
 

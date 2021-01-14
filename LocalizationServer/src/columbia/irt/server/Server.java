@@ -87,7 +87,7 @@ public class Server implements Runnable
 			throws ClassNotFoundException, IOException, InterruptedException, SQLException
 	{
 		Scanner inputReader = new Scanner(System.in);
-		int port = 9000;
+		int port = 9254;
 		
 		// Run the initial set up
 		try
