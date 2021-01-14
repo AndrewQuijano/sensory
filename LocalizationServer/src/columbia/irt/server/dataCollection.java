@@ -1,12 +1,10 @@
 package columbia.irt.server;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -34,7 +32,7 @@ public class dataCollection implements Runnable
 	// SQL Login
 	protected static String username = "";
 	protected static String password = "";
-	protected final static String DB = "IRT";
+	protected static String DB = "";
 
 	// I/O
 	private ObjectInputStream fromClient = null;
@@ -228,7 +226,7 @@ public class dataCollection implements Runnable
 			Statement stmt = conn.createStatement();
 			
 			// Build Database...
-			stmt.execute("CREATE DATABASE " + DB);
+			stmt.execute("CREATE DATABASE IF NOT EXISTS " + DB);
 			
 			//===================BUILD TRAINING TABLE=================================
 			/*
@@ -268,79 +266,41 @@ public class dataCollection implements Runnable
 				);
 			 */
 
-			String sqlTrain = "CREATE TABLE " + DB + "." + TRAININGDATA + " " +
-					"(" + 
-					" ScanID Integer PRIMARY KEY, "
-					// Location
-					+ "Longitude DECIMAL(10,3) not null, "
-					+ "Latitude DECIMAL(10,3) not null, "
-					+ "Altitude DECIMAL(10,3) not null, "
-					+ "Barometric_Altitude DECIMAL(10,3) not null, "
-					+ "sea_level DECIMAL(10,3) not null, "
-					
-					// Accuracy
-					+ "Horizontal DECIMAL(10,2) not null, "
-					+ "Vertical DECIMAL(10,2) not null, "
-					
-					// Environment
-					+ "Luminosity DECIMAL(10,3) not null, "
-					+ "Humidity DECIMAL(10,2) not null, "
-					+ "Pressure DECIMAL(10,4) not null, "
-					+ "Temperature DECIMAL(10,2) not null, "
-					+ "Audio DECIMAL(10, 2) not null, "
-					+ "Weather Text not null, "
-					
-					// Magnetic Field
-					+ "MagnetX DECIMAL(10,3) not null, "
-					+ "MagnetY DECIMAL(10,3) not null, "
-					+ "MagnetZ DECIMAL(10,3) not null, "
-					+ "TotalMagnet DECIMAL(10,5) not null, "
-					
-					// Room/Phone/Time
-					+ "currentTime DATETIME not null, "
-					+ "Floor Text, "
-					+ "Room Text, "
-					+ "Building Text, "
-					+ "Position Integer not null, "
-					+ "PhoneNumber Text, "
-					
-					// Phone Data
-					+ "OS Text not null,"
-					+ "Model Text not null,"
-					+ "Device Text not null,"
-					+ "Product Text not null"
-					+ ");";
+			String sqlTrain = "CREATE TABLE IF NOT EXISTS " + DB + "." + TRAININGDATA + "(" + 
+					"  `ID` int NOT NULL AUTO_INCREMENT, " + 
+					"  `indoors` int DEFAULT NULL, " + 
+					"  `created_at` varchar(100) NOT NULL, " + 
+					"  `device_id` varchar(100) NOT NULL, " + 
+					"  `floor` int DEFAULT NULL, " + 
+					"  `rssi_strength` int DEFAULT NULL, " + 
+					"  `gps_alt` float DEFAULT NULL, " + 
+					"  `gps_longitude` float DEFAULT NULL, " + 
+					"  `gps_latitude` float DEFAULT NULL, " + 
+					"  `gps_vertical_accuracy` int DEFAULT NULL, " + 
+					"  `gps_horizontal_accuracy` int DEFAULT NULL, " + 
+					"  `gps_course` float DEFAULT NULL, " + 
+					"  `gps_speed` float DEFAULT NULL, " + 
+					"  `baro_relative_altitude` float DEFAULT NULL, " + 
+					"  `baro_pressure` float DEFAULT NULL, " + 
+					"  `env_context` varchar(100) DEFAULT NULL, " + 
+					"  `env_mean_bldg_floors` varchar(100) DEFAULT NULL, " + 
+					"  `env_activity` varchar(100) DEFAULT NULL, " + 
+					"  `city_name` varchar(100) DEFAULT NULL, " + 
+					"  `country_name` varchar(100) DEFAULT NULL, " + 
+					"  `magnet_x_mt` float DEFAULT NULL, " + 
+					"  `magnet_y_mt` float DEFAULT NULL, " + 
+					"  `magnet_z_mt` float DEFAULT NULL, " + 
+					"  `magnet_total` float DEFAULT NULL, " + 
+					"  PRIMARY KEY (`ID`)" + 
+					") ENGINE=InnoDB AUTO_INCREMENT=1081 DEFAULT CHARSET=utf8mb4";
 			//System.out.println(sqlTrain);
 			stmt.executeUpdate(sqlTrain);
 			stmt.close();
 
 			stmt = conn.createStatement();
-
-			// COMPLETE SCAN RESULT TABLE
-			/*
-			CREATE TABLE columbia.wifi
-			(  
-			ScanID Integer, 
-			Room Text, 
-			MACAddress Text,
-			SSID Text,
-			capability Text,
-			centerFreq0 Integer,
-			centerFreq1 Integer,
-			channelWidth Text,
-			frequency Integer,
-			RSS Integer,
-			operaterFriendlyName Text,
-			timestamp Integer,
-			venueName Text,
-			80211mc Integer,
-			passPoint Integer
-			);
-			 */
-			stmt = conn.createStatement();
-			stmt.executeUpdate("CREATE TABLE " + DB + "." + APTRAIN
+			stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + DB + "." + APTRAIN
 					+ "( " 
-					+ "ScanID Integer, " 
+					+ "ID Integer NOT NULL AUTO_INCREMENT, " 
 					+ "Room Text, "
 					+ "MACAddress Text, "
 					+ "SSID Text, "
@@ -355,9 +315,8 @@ public class dataCollection implements Runnable
 					+ "venueName Text, "
 					+ "80211mc Integer, "
 					+ "passPoint Integer, "
-					+ "CONSTRAINT AP_ScanID FOREIGN KEY (ScanID) "
-					+ "REFERENCES " + DB + "." + TRAININGDATA + "(ScanID) "
-					+ ");");
+					+ "PRIMARY KEY (`ID`)"
+					+ ") ENGINE=InnoDB AUTO_INCREMENT=1081 DEFAULT CHARSET=utf8mb4");
 			stmt.close();
 			return true;
 		}

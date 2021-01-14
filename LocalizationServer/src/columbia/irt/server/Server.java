@@ -92,16 +92,18 @@ public class Server implements Runnable
 		// Run the initial set up
 		try
 		{
-			
+			String cwd = System.getProperty("user.dir");
+			System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			// Finally, load user/password credentials
 			Properties login = new Properties();
-			try (FileReader in = new FileReader("./login.properties")) 
+			try (FileReader in = new FileReader(cwd + "\\database.properties")) 
 			{
 			    login.load(in);
 			}
-			dataCollection.username = login.getProperty("username");
+			dataCollection.username = login.getProperty("user");
 			dataCollection.password = login.getProperty("password");
-			getAccessPoint.username = login.getProperty("username");
+			dataCollection.DB = login.getProperty("schema");
+			getAccessPoint.username = login.getProperty("user");
 			getAccessPoint.password = login.getProperty("password");
 			
 			// Custom Port if needed?
@@ -135,10 +137,11 @@ public class Server implements Runnable
 		// Create the Schema and Tables
 		dataCollection.init();
 		
-		// Run the servevr
+		//System.exit(0);
+		
+		// Run the server
 		Server Localizationserver = new Server(port);
 		new Thread(Localizationserver).start();
-		
 		
 		while(true)
 		{
@@ -152,7 +155,7 @@ public class Server implements Runnable
 				System.out.println("\033[H\033[2J");
 				System.out.flush();
 			}				
-			// Get AP Manfacturer Based on MAC Address
+			// Get AP Manufacturer Based on MAC Address
 			else if(commands[0].equalsIgnoreCase("AP"))
 			{
 				getAccessPoint AP = new getAccessPoint();
