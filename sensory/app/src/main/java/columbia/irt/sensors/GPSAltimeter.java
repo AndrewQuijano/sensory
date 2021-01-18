@@ -46,15 +46,17 @@ public class GPSAltimeter implements LocationListener, Runnable
     public double altitude = -1;
 
     // Other sensory features
-    List<Address> addresses;
-    Geocoder geocoder;
+    private List<Address> addresses;
+    private Geocoder geocoder;
+
+    public String env_context;
+    public String address;
     public String city_name;
     public String country_name;
 
     private Thread updateAltitude;
     private boolean isThreadRunning = false;
 
-    @SuppressLint("MissingPermission")
     public GPSAltimeter(Context context)
     {
         geocoder = new Geocoder(context, Locale.getDefault());
@@ -165,6 +167,8 @@ public class GPSAltimeter implements LocationListener, Runnable
         try
         {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            address = addresses.get(0).getThoroughfare();
+            env_context = addresses.get(0).getFeatureName();
             city_name = addresses.get(0).getLocality();
             country_name = addresses.get(0).getCountryName();
             Log.d(TAG, city_name + country_name);

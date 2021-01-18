@@ -7,6 +7,22 @@
 
     <!-- Additional Classes for sensory v2.0 -->
 
+    <EditText
+        android:id="@+id/current_floor_data"
+        android:layout_width="362dp"
+        android:layout_height="130dp"
+        android:autofillHints="Room Name"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text=""
+        android:hint="@string/current_floor_data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.673"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.978" />
+
     <Switch
         android:id="@+id/Indoors"
         android:layout_width="105dp"
@@ -53,7 +69,8 @@
         android:autofillHints="env_context"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@string/env_context"
+        android:text=""
+        android:hint="@string/env_context"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.567"
@@ -67,10 +84,10 @@
         android:layout_height="41dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.531"
+        app:layout_constraintHorizontal_bias="0.886"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.711" />
+        app:layout_constraintVertical_bias="0.707" />
 
     <EditText
         android:id="@+id/room"
@@ -79,7 +96,8 @@
         android:autofillHints="Room Name"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@string/room"
+        android:text=""
+        android:hint="@string/room"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.488"
@@ -94,12 +112,48 @@
         android:autofillHints="Building Name"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@string/building"
+        android:text=""
+        android:hint="@string/building"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.636"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.8" />
+
+    <NumberPicker
+        android:id="@+id/env_floor_picker"
+        android:layout_width="59dp"
+        android:layout_height="41dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.377"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.708" />
+
+    <TextView
+        android:id="@+id/floor_description"
+        android:layout_width="71dp"
+        android:layout_height="46dp"
+        android:layout_marginEnd="116dp"
+        android:layout_marginRight="116dp"
+        android:text="@string/floor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.712" />
+
+    <TextView
+        android:id="@+id/env_mean_floor"
+        android:layout_width="83dp"
+        android:layout_height="45dp"
+        android:text="@string/mean_building_floor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.085"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.711" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

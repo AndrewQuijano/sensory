@@ -17,6 +17,7 @@
     <string name="env_context">env_context</string>
     <string name="center">Center</string>
     <string name="collection_settings">Collection Settings</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="floor">Floor</string>
+    <string name="mean_building_floor">mean building floor</string>
+    <string name="current_floor_data">current floor data</string>
 </resources>

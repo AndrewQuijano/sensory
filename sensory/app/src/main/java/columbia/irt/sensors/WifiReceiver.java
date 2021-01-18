@@ -24,8 +24,7 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
     private boolean isRegistered = false;
 
     // Wifi Scan Results
-    int size = 0;
-    List<ScanResult> results;
+    public List<ScanResult> results;
 
     private final Context context;
 
@@ -94,8 +93,6 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
             results.clear();
         }
         results = my_wifiManager.getScanResults();
-        size = results.size();
-        Log.d(TAG, "WIFI SCAN RESULTS ARE READY! Found: " + size + " APs");
 
         // WHAT APs were found!
         // Note AP maps a MAC Address to a Physical Location
@@ -126,5 +123,15 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
         this.unregisterReceiver(context);
         this.registerReceiver(context);
         get_data();
+    }
+
+    public String getConnectedMAC()
+    {
+        return my_wifiManager.getConnectionInfo().getBSSID();
+    }
+
+    public int getConnectedRSSI()
+    {
+        return my_wifiManager.getConnectionInfo().getRssi();
     }
 }

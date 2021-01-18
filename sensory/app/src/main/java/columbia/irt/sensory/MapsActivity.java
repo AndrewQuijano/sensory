@@ -4,14 +4,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,14 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import columbia.irt.motion.MotionReceiver;
 import columbia.irt.sensors.BarometricAltimeter;
@@ -36,34 +26,28 @@ import columbia.irt.sensors.HumiditySensor;
 import columbia.irt.sensors.LightSensor;
 import columbia.irt.sensors.MagneticFieldSensor;
 import columbia.irt.sensors.TemperatureSensor;
-import columbia.irt.struct.FloorData;
+import columbia.irt.sensors.WifiReceiver;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 {
     // Sensor Classes
-    private BluetoothReceiver blueWrapper;
-    private BarometricAltimeter barometer;
-    private LightSensor light;
-    private TemperatureSensor temp;
-    private HumiditySensor humid;
-    private GPSAltimeter gps;
-    private MagneticFieldSensor magneto;
-    private MotionReceiver motion;
+    protected BluetoothReceiver blueWrapper;
+    protected static WifiReceiver wifi;
+    protected static BarometricAltimeter barometer;
+    protected LightSensor light;
+    protected TemperatureSensor temp;
+    protected HumiditySensor humid;
+    protected static GPSAltimeter gps;
+    protected static MagneticFieldSensor magneto;
+    protected static MotionReceiver motion;
 
-    // IP data
-    public final static String SQLDatabase = "72.229.36.215";
-    public final static int portNumber = 9254;
+    protected Button collection;
 
-    // Timer stuff
-    private Timer tick = new Timer();
-    private TimerTask timerTask;
-
-    Button collection;
-
+    @SuppressLint("ShowToast")
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null)
@@ -82,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }, 1001);
         }
 
-        collection.setOnClickListener(new collect());
+        //collection.setOnClickListener(new start());
 
         // Build Sensors
         SensorManager my_SensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -95,63 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         gps = new GPSAltimeter(this);
         barometer = new BarometricAltimeter(my_SensorManager, gps);
         motion = new MotionReceiver(this);
-    }
+        wifi = new WifiReceiver(this);
 
-    private class collect extends TimerTask implements View.OnClickListener
-    {
-        public void onClick(View v)
-        {
-            // 1 scan per second
-            int sampling_rate = 1;
-            // Get data from sensors
-            if (tick == null)
-            {
-                tick = new Timer();
-            }
-            if (timerTask == null)
-            {
-                timerTask = new collect();
-            }
-            // Put here time 1,000 milliseconds = 1 second
-            tick.schedule(timerTask, 0, 1000 * sampling_rate);
-        }
-
-        public void run()
-        {
-            try
-            {
-                // I/O
-                Socket clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 10 * 1000);
-
-                FloorData f = new FloorData(1, "created", "device",
-                        "floor",-100,
-                        gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
-                        barometer.barometricAltitude, barometer.pressure,
-                        "context", "mean_floors", "activity",
-                        gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
-
-                Log.d("HELLO", f.toString());
-                // Send Data
-                ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
-                toServer.writeObject(f);
-                //toServer.writeObject(null);
-
-                toServer.close();
-                if(clientSocket.isConnected())
-                {
-                    clientSocket.close();
-                }
-            }
-            catch(SocketTimeoutException ioe)
-            {
-                ioe.printStackTrace();
-            }
-            catch(IOException ioe)
-            {
-                ioe.printStackTrace();
-            }
-        }
+        setContentView(R.layout.activity_maps);
     }
 
     /**
@@ -181,6 +111,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart()
     {
         super.onStart();
+        gps.start();
+        barometer.start();
+        humid.start();
+        light.start();
+        temp.start();
+        magneto.start();
+        motion.register(this);
         //File file = FileUtil.createFile(this, "temp.amr");
         // audio.start() is implicitly called here
         //audio.startRecord(this, file);
@@ -242,67 +179,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(blueWrapper != null)
         {
             blueWrapper.unregisterReceiver(this);
-        }
-    }
-
-
-    private class start extends TimerTask implements CompoundButton.OnCheckedChangeListener
-    {
-        public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked)
-        {
-            // 1 scan per second
-            int sampling_rate = 1;
-
-            if (isChecked)
-            {
-                // Get data from sensors
-                if (tick == null)
-                {
-                    tick = new Timer();
-                }
-                if (timerTask == null)
-                {
-                    timerTask = new start();
-                }
-                // Put here time 1,000 milliseconds = 1 second
-                tick.schedule(timerTask, 0, 1000 * sampling_rate);
-            }
-        }
-
-        public void run()
-        {
-            try
-            {
-                // I/O
-                Socket clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 10 * 1000);
-
-                FloorData f = new FloorData(1, "created", "device",
-                "floor",-100,
-                gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
-                barometer.barometricAltitude, barometer.pressure,
-                "context", "mean_floors", "activity",
-                gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
-
-                // Send Data
-                ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
-                toServer.writeObject(f);
-                //toServer.writeObject(null);
-
-                toServer.close();
-                if(clientSocket.isConnected())
-                {
-                    clientSocket.close();
-                }
-            }
-            catch(SocketTimeoutException ioe)
-            {
-                ioe.printStackTrace();
-            }
-            catch(IOException ioe)
-            {
-                ioe.printStackTrace();
-            }
         }
     }
 }
