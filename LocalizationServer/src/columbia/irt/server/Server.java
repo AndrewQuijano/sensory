@@ -103,6 +103,9 @@ public class Server implements Runnable
 			dataCollection.username = login.getProperty("user");
 			dataCollection.password = login.getProperty("password");
 			dataCollection.DB = login.getProperty("schema");
+			dataCollection.TRAININGDATA = login.getProperty("android");
+			
+			
 			getAccessPoint.username = login.getProperty("user");
 			getAccessPoint.password = login.getProperty("password");
 			
@@ -167,8 +170,8 @@ public class Server implements Runnable
 			else if(commands[0].equalsIgnoreCase("sensory"))
 			{
 				// Print Android Table and iPhone table
-				dataCollection.printTable("predictDB", "sensory");
-				dataCollection.printTable("predictDB", "android");
+				dataCollection.printTable("predictDB", "ios_sensory");
+				dataCollection.printTable("predictDB", "android_sensory");
 			}
 			// Print the Wi-Fi Table
 			// It will have same structure as created in SST REU 2017

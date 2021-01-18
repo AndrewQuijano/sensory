@@ -29,10 +29,11 @@ import columbia.irt.struct.FloorData;
 
 public class dataCollection implements Runnable
 {
-	// SQL Login
+	// SQL Login and parameters
 	protected static String username = "";
 	protected static String password = "";
 	protected static String DB = "";
+	protected static String TRAININGDATA = "";
 
 	// I/O
 	private ObjectInputStream fromClient = null;
@@ -42,9 +43,7 @@ public class dataCollection implements Runnable
 	protected final static String myDriver = "org.gjt.mm.mysql.Driver";
 	protected final static String URL = "jdbc:mysql://localhost:3306/?useSSL=false";
 
-	protected final static String TRAININGDATA = "dataset";
 	protected final static String APTRAIN = "Wifi";
-
 	protected final static String WifiLUT = "WifiLUT";
 
 	protected Socket incomingClient = null;
@@ -58,6 +57,9 @@ public class dataCollection implements Runnable
 	{
 		try 
 		{
+			boolean result;
+			FloorData f = null;
+			
 			fromClient = new ObjectInputStream(incomingClient.getInputStream());
 			toClient = new ObjectOutputStream(incomingClient.getOutputStream());
 			// Read Object
@@ -65,8 +67,18 @@ public class dataCollection implements Runnable
 
 			if (x instanceof FloorData)
 			{
-				boolean result = submitTrainingData((FloorData) x);
+				result = submitTrainingData((FloorData) x);
+				f = (FloorData) x;
+				System.out.println(f.toString());
 				toClient.writeBoolean(result);
+				toClient.flush();
+			}
+
+			x = fromClient.readObject();
+			if (x instanceof List)
+			{
+				//result = submitWifiData(null, f.floor(), f.environment_context(), null);
+				toClient.writeBoolean(true);
 				toClient.flush();
 			}
 
@@ -107,50 +119,57 @@ public class dataCollection implements Runnable
 			
 			String SQL = "insert into " + DB + "." + TRAININGDATA + " "
 					+ "values "
-					+ "(default, "				// Primary Key, already done for you!
-					+ "?, ?, ?, ?, ?, "   		// 5 Classes
-					+ "?, ?, ?, ?, ?, ?, ?, "	// 7 GPS
-					+ "?, ?, "					// 2 barometric
-					+ "?, ?, ?, ?, ?, "			// 5 env features
-					+ "?, ?, ?, ? "				// 4 Magnetic field
+					+ "(default, "					// Primary Key, already done for you!
+					+ "?, ?, ?, ?, ?, ?, ?, ?, ?, "	// 9 Classes
+					+ "?, ?, ?, ?, ?, ?, ?, "		// 7 GPS
+					+ "?, ?, ?, "					// 3 barometric
+					+ "?, ?, ?, ?, ?, "				// 5 env features
+					+ "?, ?, ?, ?"					// 4 Magnetic field
 					+ ");";
 
-			// Fill up Regular Dataset based on sensory
+			// Fill up Regular Data set based on sensory
 			insert = conn.prepareStatement(SQL);
 
 			// (5) Fill up Indoors/Created At/Device ID/Floor/RSSI
 			insert.setInt(1, input.getIndoors());
 			insert.setString(2, input.created_at());
-			insert.setString(3, input.session_id());
-			insert.setInt(4, Integer.parseInt(input.floor()));
-			insert.setInt(5, input.rssi_strength());
+			insert.setString(3, input.device_id());
+			insert.setString(4, input.room());
+			insert.setInt(5, Integer.parseInt(input.floor()));
+			insert.setString(6, input.building());
+			insert.setString(7, input.connected_ap());
+			insert.setInt(8, input.rssi_strength());
+			insert.setInt(9, input.is_center());
 			
 			// (6) Fill up GPS
-			insert.setDouble(6, input.gps_alt());
-			insert.setDouble(7, input.gps_longitude());
-			insert.setDouble(8, input.gps_latitude());
-			insert.setDouble(9, input.gps_vertical_accuracy());
-			insert.setDouble(10, input.gps_horizontal_accuracy());
-			insert.setDouble(11, input.gps_course());
-			insert.setDouble(12, input.gps_speed());
+			insert.setDouble(10, input.gps_alt());
+			insert.setDouble(11, input.gps_longitude());
+			insert.setDouble(12, input.gps_latitude());
+			insert.setDouble(13, input.gps_vertical_accuracy());
+			insert.setDouble(14, input.gps_horizontal_accuracy());
+			insert.setDouble(15, input.gps_course());
+			insert.setDouble(16, input.gps_speed());
 			
-			// (2) Barometric
-			insert.setDouble(13, input.barometric_pressure());
-			insert.setDouble(14, input.barometric_relative_altitude());
+			// (3) Barometric
+			insert.setDouble(17, input.sea_level());
+			insert.setDouble(18, input.barometric_pressure());
+			insert.setDouble(19, input.barometric_relative_altitude());
 			
 			// (5) Environment
-			insert.setString(15, input.environment_context());
-			insert.setString(16, input.environment_context());
-			insert.setString(17, input.environment_mean_bldg_floors());
-			insert.setString(18, input.city_name());
-			insert.setString(19, input.country_name());
-
+			insert.setString(20, input.environment_context());
+			insert.setString(21, input.environment_context());
+			insert.setString(22, input.environment_mean_bldg_floors());
+			insert.setString(23, input.city_name());
+			insert.setString(24, input.country_name());
+			
 			// (4) Fill up Magnetic Field
-			insert.setDouble(20, input.magnet_x_mt());
-			insert.setDouble(21, input.magnet_y_mt());
-			insert.setDouble(22, input.magnet_z_mt());
-			insert.setDouble(23, input.magnet_total());	
-
+			insert.setDouble(25, input.magnet_x_mt());
+			insert.setDouble(26, input.magnet_y_mt());
+			insert.setDouble(27, input.magnet_z_mt());
+			insert.setDouble(28, input.magnet_total());	
+			
+			System.out.println(SQL);
+			
 			//Execute and Close SQL Command
 			insert.execute();
 			
@@ -192,6 +211,7 @@ public class dataCollection implements Runnable
 				insert.setString(5, res.capabilities);
 				insert.setInt(9, res.frequency);
 				insert.setInt	(10, res.level);
+
 				//Execute and Close SQL Command
 				insert.execute();
 				insert.close();
@@ -235,8 +255,12 @@ public class dataCollection implements Runnable
 					"  `indoors` int DEFAULT NULL, " + 
 					"  `created_at` varchar(100) NOT NULL, " + 
 					"  `device_id` varchar(100) NOT NULL, " + 
+					"  `room` varchar(100) NOT NULL, " + //new
 					"  `floor` int DEFAULT NULL, " + 
+					"  `building` varchar(100) NOT NULL, " + //new
+					"  `connected_ap` varchar(100) NOT NULL, "  + // new
 					"  `rssi_strength` int DEFAULT NULL, " + 
+					"  `is_center` varchar(100) NOT NULL, "  + // new
 					"  `gps_alt` float DEFAULT NULL, " + 
 					"  `gps_longitude` float DEFAULT NULL, " + 
 					"  `gps_latitude` float DEFAULT NULL, " + 
@@ -244,6 +268,7 @@ public class dataCollection implements Runnable
 					"  `gps_horizontal_accuracy` int DEFAULT NULL, " + 
 					"  `gps_course` float DEFAULT NULL, " + 
 					"  `gps_speed` float DEFAULT NULL, " + 
+					"  `baro_sea_level` float DEFAULT NULL, " + // new
 					"  `baro_relative_altitude` float DEFAULT NULL, " + 
 					"  `baro_pressure` float DEFAULT NULL, " + 
 					"  `env_context` varchar(100) DEFAULT NULL, " + 
