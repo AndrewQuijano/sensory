@@ -193,10 +193,10 @@ public class dataCollection implements Runnable
 		{
 			Class.forName(myDriver);
 			Connection conn = DriverManager.getConnection(URL, username, password);
-			String query =
-					"SELECT ID "
+			String query = "SELECT ID "
 					+ " FROM " + DB + '.' + TRAININGDATA
-					+ " ORDER BY DESC LIMIT 1;";
+					+ " ORDER BY ID DESC "
+					+ " LIMIT 1;";
 			PreparedStatement st = conn.prepareStatement(query);
 			st.execute();
 			ResultSet rs = st.executeQuery();
@@ -236,7 +236,7 @@ public class dataCollection implements Runnable
 				insert = conn.prepareStatement(""
 						+ "insert into " + DB + "." + APTRAIN + " values("
 						+ "?, ?, ?, ?, " 	// (4) Scan ID and labels
-						+ "?, ?, ?, ?, ? "	// (5) Basic Scan Result Labels
+						+ "?, ?, ?, ?, ?, "	// (5) Basic Scan Result Labels
 						+ "?, ?, ?, ?, "	// (4) First 4 advanced features
 						+ "?, ?, ?, ? "		// (4) Last 4 advanced features
 						+ ");");
@@ -343,23 +343,24 @@ public class dataCollection implements Runnable
 			stmt = conn.createStatement();
 			stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + DB + "." + APTRAIN
 					+ "( " 
-					+ "ID Integer DEFAULT NULL, "
+					+ "ID Integer NOT NULL, "
 					+ "Room varchar(100) DEFAULT NULL,  "
 					+ "Floor varchar(100) DEFAULT NULL,  "
 					+ "Building varchar(100) DEFAULT NULL,  "
-					+ "MACAddress varchar(100) , "
-					+ "SSID varchar(100) , "
+					+ "MACAddress varchar(100), "
+					+ "SSID varchar(100), "
 					+ "capability  varchar(100), "
 					+ "frequency Integer, "
-					+ "RSS Integer "
+					+ "RSS Integer, "
 			  		+ "centerFreq0 Integer, "
 					+ "centerFreq1 Integer, "
-					+ "channelWidth varchar(100) , "
+					+ "channelWidth varchar(100), "
 					+ "operaterFriendlyName varchar(100) , "
 					+ "timestamp Integer, "
 					+ "venueName varchar(100) , "
 					+ "80211mc Integer, "
-					+ "passPoint Integer "
+					+ "passPoint Integer, "
+					+ "PRIMARY KEY (ID) "
 					+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 			stmt.close();
 			return true;
@@ -390,12 +391,10 @@ public class dataCollection implements Runnable
 		{
 			Class.forName(myDriver);
 			Connection conn = DriverManager.getConnection(URL, username, password);
-			PreparedStatement st = conn.prepareStatement("SHOW COLUMNS FROM ?.?;");
-			st.setString(1, database);
-			st.setString(2, table);
-			
+			PreparedStatement st = conn.prepareStatement("SHOW COLUMNS FROM " + database + '.' + table);
 			ResultSet rs;
 			
+			//System.out.println(st.toString());
 			// Get the Column Names
 			rs = st.executeQuery();
 			while (rs.next())
@@ -405,9 +404,7 @@ public class dataCollection implements Runnable
 			header = columns.stream().collect(Collectors.joining(","));
 			
 			// Use Select * to get all the rows
-			st = conn.prepareStatement("SELECT * FROM ?.?;");
-			st.setString(1, database);
-			st.setString(2, table);
+			st = conn.prepareStatement("SELECT * FROM " + database + '.' + table);
 			rs = st.executeQuery();
 			ResultSetMetaData resultSetMetaData = rs.getMetaData();
 			
@@ -421,24 +418,36 @@ public class dataCollection implements Runnable
 			
 			while(rs.next())
 			{
+				
 				// For each row
+				// FOr more types: 
+				// https://docs.oracle.com/javase/8/docs/api/constant-values.html
 				for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 				{
 					int type = resultSetMetaData.getColumnType(i);
 					if (type == Types.VARCHAR || type == Types.CHAR) 
 					{
-						writeCSV.println(rs.getString(i));
+						//System.out.println(rs.getString(i));
+						writeCSV.print(rs.getString(i));
 					}
 					else if(type == Types.FLOAT)
 					{
-						writeCSV.println(rs.getFloat(i));
+						System.out.println(rs.getFloat(i));
+						writeCSV.print(rs.getFloat(i));
 					}
-					else if(type == Types.INTEGER)
+					else if(type == Types.INTEGER || type == Types.REAL)
 					{
-						writeCSV.println(rs.getInt(i));	
+						//System.out.println(rs.getInt(i));
+						writeCSV.print(rs.getInt(i));	
 					}
+					else
+					{
+						System.out.println("What??? " + type);
+					}
+					writeCSV.print(',');
 					// Can fill for more types, but these are all I need really...
 				}
+				writeCSV.println();
 			}
 			writeCSV.close();
 		}

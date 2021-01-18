@@ -88,14 +88,14 @@ public class Server implements Runnable
 	{
 		Scanner inputReader = new Scanner(System.in);
 		int port = 9254;
-		
+		Properties login = null;
 		// Run the initial set up
 		try
 		{
 			String cwd = System.getProperty("user.dir");
 			System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			// Finally, load user/password credentials
-			Properties login = new Properties();
+			login = new Properties();
 			try (FileReader in = new FileReader(cwd + "\\database.properties")) 
 			{
 			    login.load(in);
@@ -170,8 +170,8 @@ public class Server implements Runnable
 			else if(commands[0].equalsIgnoreCase("sensory"))
 			{
 				// Print Android Table and iPhone table
-				dataCollection.printTable("predictDB", "ios_sensory");
-				dataCollection.printTable("predictDB", "android_sensory");
+				dataCollection.printTable(dataCollection.DB, dataCollection.TRAININGDATA);
+				//dataCollection.printTable(dataCollection.DB, login.getProperty("table"));
 			}
 			// Print the Wi-Fi Table
 			// It will have same structure as created in SST REU 2017
