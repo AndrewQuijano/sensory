@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import android.net.wifi.ScanResult;
 import columbia.irt.struct.FloorData;
+import columbia.irt.struct.WifiData;
 
 
 public class dataCollection implements Runnable
@@ -67,18 +67,15 @@ public class dataCollection implements Runnable
 
 			if (x instanceof FloorData)
 			{
-				result = submitTrainingData((FloorData) x);
 				f = (FloorData) x;
+				result = submitTrainingData(f);
 				System.out.println(f.toString());
-				toClient.writeBoolean(result);
-				toClient.flush();
-			}
+					
+				WifiData wifi = f.wifi();
+				int scan = getScanID();
 
-			x = fromClient.readObject();
-			if (x instanceof List)
-			{
-				//result = submitWifiData(null, f.floor(), f.environment_context(), null);
-				toClient.writeBoolean(true);
+				result = submitWifiData(scan, f.room(), f.floor(), f.building(), wifi);
+				toClient.writeBoolean(result);
 				toClient.flush();
 			}
 
@@ -168,7 +165,7 @@ public class dataCollection implements Runnable
 			insert.setDouble(27, input.magnet_z_mt());
 			insert.setDouble(28, input.magnet_total());	
 			
-			System.out.println(SQL);
+			//System.out.println(SQL);
 			
 			//Execute and Close SQL Command
 			insert.execute();
@@ -189,33 +186,89 @@ public class dataCollection implements Runnable
 		}
 	}
 
-	public static boolean submitWifiData(String Room, String floor, String Building, List<ScanResult> result)
+	public static int getScanID()
+	{
+		int id = -1;
+		try
+		{
+			Class.forName(myDriver);
+			Connection conn = DriverManager.getConnection(URL, username, password);
+			String query =
+					"SELECT ID "
+					+ " FROM " + DB + '.' + TRAININGDATA
+					+ " ORDER BY DESC LIMIT 1;";
+			PreparedStatement st = conn.prepareStatement(query);
+			st.execute();
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next())
+			{
+				id = rs.getInt(1);
+			}
+			return id;
+		}
+		
+		catch(SQLException se)
+		{
+			se.printStackTrace();
+			return -1;
+		}
+		catch(ClassNotFoundException cnf)
+		{
+			System.err.println("Class Not Found Exception Caught");
+			return -1;
+		}
+	}
+	
+	public static boolean submitWifiData(int scanID, String Room, String floor, String Building, WifiData result)
 	{
 		try
 		{
 			Class.forName(myDriver);
 			PreparedStatement insert = null;
 			Connection conn = DriverManager.getConnection(URL, username, password);
+			System.out.println("Connected");
 			
-			// Fill up Wifi Training Table
-			for (ScanResult res: result)
+			
+			// Fill up Wi-Fi Training Table
+			for (int i = 0; i < result.WifiAPs.length; i++)
 			{
 				insert = conn.prepareStatement(""
-						+ "insert into " + DB + "." + APTRAIN + " "
-						+ "values(?, ?, ?, ?, "
-						+ "?, ?, ?, ?, ?, "
-						+ "?, ?, ?, ?, ?, ?);");
+						+ "insert into " + DB + "." + APTRAIN + " values("
+						+ "?, ?, ?, ?, " 	// (4) Scan ID and labels
+						+ "?, ?, ?, ?, ? "	// (5) Basic Scan Result Labels
+						+ "?, ?, ?, ?, "	// (4) First 4 advanced features
+						+ "?, ?, ?, ? "		// (4) Last 4 advanced features
+						+ ");");
+				insert.setInt(1, scanID);
 				insert.setString(2, Room);
-				insert.setString(3, res.BSSID);
-				insert.setString(4, res.SSID);
-				insert.setString(5, res.capabilities);
-				insert.setInt(9, res.frequency);
-				insert.setInt	(10, res.level);
+				insert.setString(3, floor);
+				insert.setString(4, Building);
+				
+				// Basic 5
+				insert.setString(5, result.WifiAPs[i]);
+				insert.setString(6, result.SSID[i]);
+				insert.setString(7, result.capabilities[i]);
+				insert.setInt(8, result.frequency[i]);
+				insert.setInt(9, result.WifiRSS[i]);
+				
+				// 8 Advanced features
+				insert.setInt(10, result.centerFreq0[i]);
+				insert.setInt(11, result.centerFreq1[i]);
+				insert.setString(12, result.channelWidth[i]);
+				insert.setString(13, result.operatorFriendlyName[i]);
+			
+				insert.setLong(14, result.timestamp[i]);
+				insert.setString(15, result.vanueName[i]);
+				insert.setInt(16, result.is80211mc[i]);
+				insert.setInt(17, result.isPassPoint[i]);
 
 				//Execute and Close SQL Command
 				insert.execute();
 				insert.close();
 			}
+			
+			conn.prepareCall("commit;").execute();
 			return true;
 		}
 		catch(SQLException se)
@@ -225,6 +278,7 @@ public class dataCollection implements Runnable
 		}
 		catch(ClassNotFoundException cnf)
 		{
+			cnf.printStackTrace();
 			return false;
 		}
 	}
@@ -289,23 +343,24 @@ public class dataCollection implements Runnable
 			stmt = conn.createStatement();
 			stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + DB + "." + APTRAIN
 					+ "( " 
-					+ "ID Integer NOT NULL AUTO_INCREMENT, " 
-					+ "Room Text, "
-					+ "MACAddress Text, "
-					+ "SSID Text, "
-					+ "capability Text, "
-					+ "centerFreq0 Integer, "
-					+ "centerFreq1 Integer, "
-					+ "channelWidth Text, "
+					+ "ID Integer DEFAULT NULL, "
+					+ "Room varchar(100) DEFAULT NULL,  "
+					+ "Floor varchar(100) DEFAULT NULL,  "
+					+ "Building varchar(100) DEFAULT NULL,  "
+					+ "MACAddress varchar(100) , "
+					+ "SSID varchar(100) , "
+					+ "capability  varchar(100), "
 					+ "frequency Integer, "
-					+ "RSS Integer, "
-					+ "operaterFriendlyName Text, "
+					+ "RSS Integer "
+			  		+ "centerFreq0 Integer, "
+					+ "centerFreq1 Integer, "
+					+ "channelWidth varchar(100) , "
+					+ "operaterFriendlyName varchar(100) , "
 					+ "timestamp Integer, "
-					+ "venueName Text, "
+					+ "venueName varchar(100) , "
 					+ "80211mc Integer, "
-					+ "passPoint Integer, "
-					+ "PRIMARY KEY (`ID`)"
-					+ ") ENGINE=InnoDB AUTO_INCREMENT=1081 DEFAULT CHARSET=utf8mb4");
+					+ "passPoint Integer "
+					+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 			stmt.close();
 			return true;
 		}

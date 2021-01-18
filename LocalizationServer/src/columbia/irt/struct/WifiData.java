@@ -1,34 +1,45 @@
 package columbia.irt.struct;
 
+import android.net.wifi.ScanResult;
+import android.os.Build;
 
 import java.io.Serializable;
 import java.util.List;
 
-import android.net.wifi.ScanResult;
-import android.os.Build;
 import static android.net.wifi.ScanResult.CHANNEL_WIDTH_160MHZ;
 import static android.net.wifi.ScanResult.CHANNEL_WIDTH_20MHZ;
 import static android.net.wifi.ScanResult.CHANNEL_WIDTH_40MHZ;
 import static android.net.wifi.ScanResult.CHANNEL_WIDTH_80MHZ;
 import static android.net.wifi.ScanResult.CHANNEL_WIDTH_80MHZ_PLUS_MHZ;
 
+/**
+ * This class is essentially the same thing as List<ScanResult>
+ * Unfortunately, ScanResult doesn't implement Serializable, so I need to build this
+ * new object to handle serialization.
+ */
+
 public class WifiData implements Serializable
 {
 	private static final long serialVersionUID = 6901070322763386242L;
 	
+	// Basic Data
 	public String  [] WifiAPs;
     public String  [] SSID;
     public String  [] capabilities;
+    public Integer [] WifiRSS;
+    public Integer [] frequency;
+
+    // Advanced Data on later Droids
     public Integer [] centerFreq0;
     public Integer [] centerFreq1;
     public String  [] channelWidth;
-    public Integer [] frequency;
-    public Integer [] WifiRSS;
     public String  [] operatorFriendlyName;
+    
+    public Integer [] is80211mc;
     public Long    [] timestamp;
     public String  [] vanueName;
     public Integer [] isPassPoint;
-    public Integer [] is80211mc;
+
 
     public WifiData(List<ScanResult> results)
     {
@@ -102,8 +113,6 @@ public class WifiData implements Serializable
         }
     }
 
-    // Pulled Jar from 
-    // https://androidsdkmanager.azurewebsites.net/SDKPlatform
     private String getChannel(int channel)
     {
         String answer;
