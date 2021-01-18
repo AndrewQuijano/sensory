@@ -39,6 +39,9 @@ public class FloorData implements Serializable
 	private final double magnet_z_mt;
 	private double magnet_total;
 
+	private final WifiData result;
+
+	// This is only for Sensory functionality
 	// Fill data from sensors
 	public FloorData(
 			int indoors, String created_at, String device_id,
@@ -48,7 +51,7 @@ public class FloorData implements Serializable
 			double gps_course, double gps_speed, double barometric_relative_altitude,
 			double sea_level, double barometric_pressure, String environment_context, String environment_mean_bldg_floors,
 			String environment_activity, String city_name, String country_name,
-			double magnet_x_mt, double magnet_y_mt, double magnet_z_mt
+			double magnet_x_mt, double magnet_y_mt, double magnet_z_mt, WifiData result
 	)
 	{
 		// Table has ID as auto-incremented private key
@@ -84,6 +87,7 @@ public class FloorData implements Serializable
 		this.magnet_total += magnet_y_mt * magnet_y_mt;
 		this.magnet_total += magnet_z_mt * magnet_z_mt;
 		this.magnet_total = Math.sqrt(magnet_total);
+		this.result = result;
 	}
 
 	public int getIndoors()
@@ -227,65 +231,69 @@ public class FloorData implements Serializable
 		return this.magnet_total;
 	}
 
+	public WifiData wifi()
+	{
+		return this.result;
+	}
+
 	public String toString()
 	{
-		StringBuilder result = new StringBuilder();
-		result.append(this.getIndoors());
-		result.append(',');
-		result.append(this.created_at());
-		result.append(',');
-		result.append(this.device_id());
-		result.append(',');
-		result.append(this.room());
-		result.append(',');
-		result.append(this.floor());
-		result.append(',');
-		result.append(this.building());
-		result.append(',');
-		result.append(this.connected_ap());
-		result.append(',');
-		result.append(this.rssi_strength());
-		result.append(',');
-		result.append(this.is_center());
-		result.append(',');
-		result.append(this.gps_latitude());
-		result.append(',');
-		result.append(this.gps_alt());
-		result.append(',');
-		result.append(this.gps_longitude());
-		result.append(',');
-		result.append(this.gps_vertical_accuracy());
-		result.append(',');
-		result.append(this.gps_horizontal_accuracy());
-		result.append(',');
-		result.append(this.gps_course());
-		result.append(',');
-		result.append(this.gps_speed());
-		result.append(',');
-		result.append(this.sea_level());
-		result.append(',');
-		result.append(this.barometric_relative_altitude());
-		result.append(',');
-		result.append(this.barometric_pressure());
-		result.append(',');
-		result.append(this.environment_context());
-		result.append(',');
-		result.append(this.environment_mean_bldg_floors());
-		result.append(',');
-		result.append(this.environment_activity());
-		result.append(',');
-		result.append(this.city_name());
-		result.append(',');
-		result.append(this.country_name());
-		result.append(',');
-		result.append(this.magnet_x_mt());
-		result.append(',');
-		result.append(this.magnet_y_mt());
-		result.append(',');
-		result.append(this.magnet_z_mt());
-		result.append(',');
-		result.append(this.magnet_total());
-		result.append(',');
-		return result.toString();
+		return String.valueOf(this.getIndoors()) +
+				',' +
+				this.created_at() +
+				',' +
+				this.device_id() +
+				',' +
+				this.room() +
+				',' +
+				this.floor() +
+				',' +
+				this.building() +
+				',' +
+				this.connected_ap() +
+				',' +
+				this.rssi_strength() +
+				',' +
+				this.is_center() +
+				',' +
+				this.gps_latitude() +
+				',' +
+				this.gps_alt() +
+				',' +
+				this.gps_longitude() +
+				',' +
+				this.gps_vertical_accuracy() +
+				',' +
+				this.gps_horizontal_accuracy() +
+				',' +
+				this.gps_course() +
+				',' +
+				this.gps_speed() +
+				',' +
+				this.sea_level() +
+				',' +
+				this.barometric_relative_altitude() +
+				',' +
+				this.barometric_pressure() +
+				',' +
+				this.environment_context() +
+				',' +
+				this.environment_mean_bldg_floors() +
+				',' +
+				this.environment_activity() +
+				',' +
+				this.city_name() +
+				',' +
+				this.country_name() +
+				',' +
+				this.magnet_x_mt() +
+				',' +
+				this.magnet_y_mt() +
+				',' +
+				this.magnet_z_mt() +
+				',' +
+				this.magnet_total() +
+				',' +
+				wifi().toString();
 	}
 }

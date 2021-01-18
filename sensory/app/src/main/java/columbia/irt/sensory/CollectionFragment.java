@@ -132,7 +132,8 @@ public class CollectionFragment extends Fragment
                 barometer.pressure_at_sea_level, barometer.barometricAltitude, barometer.pressure,
                 env_context.getText().toString(),
                 env_building_mean_floor_options[env_building_mean_floor.getValue()], motion.getActivity(),
-                gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
+                gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
+                wifi.wifi_results);
         current_floor_data.setText(f.toString());
         building.setText(gps.address);
         env_context.setText(gps.env_context);
@@ -213,12 +214,13 @@ public class CollectionFragment extends Fragment
                         barometer.pressure_at_sea_level, barometer.barometricAltitude, barometer.pressure,
                         env_context.getText().toString(),
                         env_building_mean_floor_options[env_building_mean_floor.getValue()], motion.getActivity(),
-                        gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ);
+                        gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
+                        wifi.wifi_results);
                 current_floor_data.post(() -> current_floor_data.setText(f.toString()));
 
                 // I/O
                 Socket clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 10 * 1000);
+                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 2 * 1000);
 
                 // Send Data
                 ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -226,17 +228,6 @@ public class CollectionFragment extends Fragment
                 toServer.writeObject(f);
                 toServer.flush();
 
-                if(fromServer.readBoolean())
-                {
-                    send_successful.show();
-                }
-                else
-                {
-                    send_failed.show();
-                }
-
-                toServer.writeObject(wifi.results);
-                toServer.flush();
                 if(fromServer.readBoolean())
                 {
                     send_successful.show();

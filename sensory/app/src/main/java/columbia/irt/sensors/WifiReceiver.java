@@ -12,6 +12,8 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
+import columbia.irt.struct.WifiData;
+
 import static android.widget.Toast.LENGTH_LONG;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -24,7 +26,8 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
     private boolean isRegistered = false;
 
     // Wifi Scan Results
-    public List<ScanResult> results;
+    private List<ScanResult> results;
+    public WifiData wifi_results;
 
     private final Context context;
 
@@ -93,10 +96,7 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
             results.clear();
         }
         results = my_wifiManager.getScanResults();
-
-        // WHAT APs were found!
-        // Note AP maps a MAC Address to a Physical Location
-        // e. g. MAC 1 -> Broadway 3
+        wifi_results = new WifiData(results);
 
         if (loading != null)
         {
