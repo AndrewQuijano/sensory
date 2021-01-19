@@ -47,7 +47,7 @@ public class GPSAltimeter implements LocationListener, Runnable
 
     // Other sensory features
     private List<Address> addresses;
-    private Geocoder geocoder;
+    private final Geocoder geocoder;
 
     public String env_context;
     public String address;
@@ -114,6 +114,8 @@ public class GPSAltimeter implements LocationListener, Runnable
         try
         {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            address = addresses.get(0).getThoroughfare();
+            env_context = addresses.get(0).getFeatureName();
             city_name = addresses.get(0).getLocality();
             country_name = addresses.get(0).getCountryName();
             Log.d(TAG, city_name + country_name);

@@ -125,13 +125,13 @@ public class CollectionFragment extends Fragment
         gps.start();
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
         f = new FloorData(isIndoor, timeStamp, android_model, room.getText().toString(),
-                floor_options[floor.getValue()], building.getText().toString(),
+                floor_options[floor.getValue() - 1], building.getText().toString(),
                 wifi.getConnectedMAC(), wifi.getConnectedRSSI(), this.isCenter,
                 gps.altitude,
                 gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
                 barometer.pressure_at_sea_level, barometer.barometricAltitude, barometer.pressure,
                 env_context.getText().toString(),
-                env_building_mean_floor_options[env_building_mean_floor.getValue()], motion.getActivity(),
+                env_building_mean_floor_options[env_building_mean_floor.getValue() - 1], motion.getActivity(),
                 gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
                 wifi.wifi_results);
         current_floor_data.setText(f.toString());
@@ -207,13 +207,13 @@ public class CollectionFragment extends Fragment
             {
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
                 f = new FloorData(isIndoor, timeStamp, android_model, room.getText().toString(),
-                        floor_options[floor.getValue()], building.getText().toString(),
+                        floor_options[floor.getValue() - 1], building.getText().toString(),
                         wifi.getConnectedMAC(), wifi.getConnectedRSSI(), isCenter,
                         gps.altitude,
                         gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
                         barometer.pressure_at_sea_level, barometer.barometricAltitude, barometer.pressure,
                         env_context.getText().toString(),
-                        env_building_mean_floor_options[env_building_mean_floor.getValue()], motion.getActivity(),
+                        env_building_mean_floor_options[env_building_mean_floor.getValue() - 1], motion.getActivity(),
                         gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
                         wifi.wifi_results);
                 current_floor_data.post(() -> current_floor_data.setText(f.toString()));

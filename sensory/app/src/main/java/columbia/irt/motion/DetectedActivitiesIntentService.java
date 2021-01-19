@@ -21,11 +21,6 @@ public class DetectedActivitiesIntentService extends IntentService
         super(TAG);
     }
 
-    public void onCreate()
-    {
-        super.onCreate();
-    }
-
     protected void onHandleIntent(Intent intent)
     {
         ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);

@@ -103,7 +103,7 @@ public class BluetoothReceiver extends BroadcastReceiver implements Runnable
     private boolean isRegistered = false;
     private final ProgressBar loading;
     protected int isScanning = -1;    // Not initialized
-    public HashMap<String, Integer> bluetoothData = new HashMap<>();
+    public final HashMap<String, Integer> bluetoothData = new HashMap<>();
 
     // Henning asked to get all relevant Bluetooth Data
     public String[] BlueAPs = null;
@@ -113,7 +113,7 @@ public class BluetoothReceiver extends BroadcastReceiver implements Runnable
     public String[] device_type = null;    // Connector Type
     public String[] device_name = null;    // SSID
     public String[] device_sort = null;    // Laptop, computer, etc.
-    public HashMap<String, String> device_to_uuid = new HashMap<>();
+    public final HashMap<String, String> device_to_uuid = new HashMap<>();
 
     // Turn off progress bar on wifi scan complete
     private static long start_time = 0;

@@ -1,4 +1,5 @@
-// Source: https://github.com/aulanov/altidroid/blob/master/src/org/openskydive/altidroid/sensor/BarometricAltimeter.java
+// Source:
+// https://github.com/aulanov/altidroid/blob/master/src/org/openskydive/altidroid/sensor/BarometricAltimeter.java
 
 package columbia.irt.sensors;
 

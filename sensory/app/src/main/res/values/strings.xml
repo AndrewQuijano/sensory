@@ -20,4 +20,5 @@
     <string name="floor">Floor</string>
     <string name="mean_building_floor">mean building floor</string>
     <string name="current_floor_data">current floor data</string>
+    <string name="set_map">Set Map</string>
 </resources>
