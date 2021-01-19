@@ -33,37 +33,36 @@ def setup():
         cursor_instance = connection.cursor()
 
         # SQL Statement to create a schema
-        schema = "CREATE SCHEMA IF NOT EXISTS '" + scheme + "'"
+        schema = "CREATE SCHEMA IF NOT EXISTS " + scheme + ";"
         cursor_instance.execute(schema)
 
         # SQL statement to create the table
-
         table = "CREATE TABLE IF NOT EXISTS " + scheme + '.' + tbl + \
-                "( `ID` int NOT NULL AUTO_INCREMENT," \
-                "`indoors` int DEFAULT NULL," \
-                "`created_at` varchar(100) NOT NULL," \
-                "`device_id` varchar(100) NOT NULL," \
-                "`floor` int DEFAULT NULL, " \
-                "`rssi_strength` int DEFAULT NULL," \
-                "`gps_alt` float DEFAULT NULL," \
-                "`gps_longitude` float DEFAULT NULL," \
-                "`gps_latitude' float DEFAULT NULL," \
-                "`gps_vertical_accuracy` int DEFAULT NULL," \
-                "`gps_horizontal_accuracy` int DEFAULT NULL," \
-                "`gps_course` float DEFAULT NULL," \
-                "`gps_speed` float DEFAULT NULL," \
-                "`baro_relative_altitude` float DEFAULT NULL," \
-                "`baro_pressure` float DEFAULT NULL," \
-                "`env_context` varchar(100) DEFAULT NULL," \
-                "`env_mean_bldg_floors` varchar(100) DEFAULT NULL," \
-                "`env_activity` varchar(100) DEFAULT NULL," \
-                "`city_name` varchar(100) DEFAULT NULL," \
-                "`country_name` varchar(100) DEFAULT NULL," \
-                "`magnet_x_mt` float DEFAULT NULL," \
-                "`magnet_y_mt` float DEFAULT NULL," \
-                "`magnet_z_mt` float DEFAULT NULL," \
-                "`magnet_total` float DEFAULT NULL," \
-                "PRIMARY KEY(`ID`)" \
+                "( ID int NOT NULL AUTO_INCREMENT," \
+                "indoors int DEFAULT NULL," \
+                "created_at varchar(100) NOT NULL," \
+                "device_id varchar(100) NOT NULL," \
+                "floor int DEFAULT NULL, " \
+                "rssi_strength int DEFAULT NULL," \
+                "gps_alt float DEFAULT NULL," \
+                "gps_longitude float DEFAULT NULL," \
+                "gps_latitude float DEFAULT NULL," \
+                "gps_vertical_accuracy int DEFAULT NULL," \
+                "gps_horizontal_accuracy int DEFAULT NULL," \
+                "gps_course float DEFAULT NULL," \
+                "gps_speed float DEFAULT NULL," \
+                "baro_relative_altitude float DEFAULT NULL," \
+                "baro_pressure float DEFAULT NULL," \
+                "env_context varchar(100) DEFAULT NULL," \
+                "env_mean_bldg_floors varchar(100) DEFAULT NULL," \
+                "env_activity varchar(100) DEFAULT NULL," \
+                "city_name varchar(100) DEFAULT NULL," \
+                "country_name varchar(100) DEFAULT NULL," \
+                "magnet_x_mt float DEFAULT NULL," \
+                "magnet_y_mt float DEFAULT NULL," \
+                "magnet_z_mt float DEFAULT NULL," \
+                "magnet_total float DEFAULT NULL," \
+                "PRIMARY KEY(ID)" \
                 ") ENGINE = InnoDB AUTO_INCREMENT = 1081 DEFAULT CHARSET = utf8mb4"
         cursor_instance.execute(table)
 
@@ -75,14 +74,12 @@ def setup():
 
 
 def get_properties():
-    config = configparser.ConfigParser()
-    config.read('database.properties')
-    usr = config['Database']['user']
-    passwd = config['Database']['password']
-    tbl = config['Database']['table']
-    scheme = config['Database']['schema']
-    engine = create_engine("mysql+pymysql://{u}:{p}@{h}/{s}".format(u=usr, p=passwd, h="127.0.0.1:3306", s=scheme),
-                           pool_pre_ping=True)
+    global tbl
+    global usr
+    global passwd
+    global scheme
+    engine = create_engine("mysql+pymysql://{u}:{p}@{h}/{s}".format(
+        u=usr, p=passwd, h="127.0.0.1:3306", s=scheme), pool_pre_ping=True)
     return tbl, engine
 
 
@@ -98,4 +95,5 @@ def predict():
 
 
 if __name__ == "__main__":
+    setup()
     app.run(host="192.168.1.208", port=3000, debug=True)

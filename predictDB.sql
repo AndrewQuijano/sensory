@@ -25,11 +25,6 @@ CREATE TABLE IF NOT EXISTS sensory_schema.`predictDB` (
   `magnet_x_mt` float DEFAULT NULL,
   `magnet_y_mt` float DEFAULT NULL,
   `magnet_z_mt` float DEFAULT NULL,
-  `magnet_total` float DEFAULT NULL,
-
- 
-
- 
- 
+  `magnet_total` float DEFAULT NULL, 
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1081 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

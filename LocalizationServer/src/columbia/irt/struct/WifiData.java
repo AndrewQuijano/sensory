@@ -20,26 +20,21 @@ import static android.net.wifi.ScanResult.CHANNEL_WIDTH_80MHZ_PLUS_MHZ;
 
 public class WifiData implements Serializable
 {
-	private static final long serialVersionUID = 6901070322763386242L;
-	
-	// Basic Data
-	public String  [] WifiAPs;
-    public String  [] SSID;
-    public String  [] capabilities;
-    public Integer [] WifiRSS;
-    public Integer [] frequency;
+    private static final long serialVersionUID = 6901070322763386242L;
 
-    // Advanced Data on later Droids
-    public Integer [] centerFreq0;
-    public Integer [] centerFreq1;
-    public String  [] channelWidth;
-    public String  [] operatorFriendlyName;
-    
-    public Integer [] is80211mc;
-    public Long    [] timestamp;
-    public String  [] vanueName;
-    public Integer [] isPassPoint;
-
+    public final String  [] WifiAPs;
+    public final String  [] SSID;
+    public final String  [] capabilities;
+    public final Integer [] centerFreq0;
+    public final Integer [] centerFreq1;
+    public final String  [] channelWidth;
+    public final Integer [] frequency;
+    public final Integer [] WifiRSS;
+    public final String  [] operatorFriendlyName;
+    public final Long    [] timestamp;
+    public final String  [] vanueName;
+    public final Integer [] isPassPoint;
+    public final Integer [] is80211mc;
 
     public WifiData(List<ScanResult> results)
     {

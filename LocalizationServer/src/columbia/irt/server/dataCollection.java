@@ -222,13 +222,12 @@ public class dataCollection implements Runnable
 	
 	public static boolean submitWifiData(int scanID, String Room, String floor, String Building, WifiData result)
 	{
+		PreparedStatement insert = null;
 		try
 		{
 			Class.forName(myDriver);
-			PreparedStatement insert = null;
 			Connection conn = DriverManager.getConnection(URL, username, password);
-			System.out.println("Connected");
-			
+
 			
 			// Fill up Wi-Fi Training Table
 			for (int i = 0; i < result.WifiAPs.length; i++)
@@ -240,6 +239,8 @@ public class dataCollection implements Runnable
 						+ "?, ?, ?, ?, "	// (4) First 4 advanced features
 						+ "?, ?, ?, ? "		// (4) Last 4 advanced features
 						+ ");");
+				
+				// Scan id and labels
 				insert.setInt(1, scanID);
 				insert.setString(2, Room);
 				insert.setString(3, floor);
@@ -273,6 +274,7 @@ public class dataCollection implements Runnable
 		}
 		catch(SQLException se)
 		{
+			System.out.println("Evil: " + insert.toString());
 			se.printStackTrace();
 			return false;
 		}
@@ -291,18 +293,26 @@ public class dataCollection implements Runnable
 	 * @return 
 	 * true: successfully initialized
 	 * false: failed, might alraedy by there though
+	 * 
+	 * References:
+	 * https://stackoverflow.com/questions/39463134/how-to-store-emoji-character-in-mysql-database
+	 * https://stackoverflow.com/questions/38813689/cant-initialize-character-set-utf8mb4-with-windows-mysql-python
+	 * 
+	 * THERE ARE APPARENTLY UTF-8 EMOJIS IN SSIDs! This configuration was needed JUST IN CASE!
 	 */
 	public static boolean init()
 	{
+		Statement stmt = null;
 		try
 		{
 			Class.forName(myDriver);
 			System.out.println("Connecting to a local database...");
 			Connection conn = DriverManager.getConnection(URL, username, password);
-			Statement stmt = conn.createStatement();
+			stmt = conn.createStatement();
 			
 			// Build Database...
-			stmt.execute("CREATE DATABASE IF NOT EXISTS " + DB);
+			// https://stackoverflow.com/questions/39463134/how-to-store-emoji-character-in-mysql-database
+			stmt.execute("CREATE DATABASE IF NOT EXISTS " + DB + " DEFAULT CHARSET = utf8mb4 DEFAULT COLLATE = utf8mb4_unicode_ci");
 
 			String sqlTrain = "CREATE TABLE IF NOT EXISTS " + DB + "." + TRAININGDATA + "(" + 
 					"  `ID` int NOT NULL AUTO_INCREMENT, " + 
@@ -335,7 +345,7 @@ public class dataCollection implements Runnable
 					"  `magnet_z_mt` float DEFAULT NULL, " + 
 					"  `magnet_total` float DEFAULT NULL, " + 
 					"  PRIMARY KEY (`ID`)" + 
-					") ENGINE=InnoDB AUTO_INCREMENT=1081 DEFAULT CHARSET=utf8mb4";
+					") AUTO_INCREMENT=1081 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE = utf8mb4_unicode_ci";
 			//System.out.println(sqlTrain);
 			stmt.executeUpdate(sqlTrain);
 			stmt.close();
@@ -348,6 +358,7 @@ public class dataCollection implements Runnable
 					+ "Floor varchar(100) DEFAULT NULL,  "
 					+ "Building varchar(100) DEFAULT NULL,  "
 					+ "MACAddress varchar(100), "
+					// OK There are UTF-8 emojis on some SSIDs....
 					+ "SSID varchar(100), "
 					+ "capability  varchar(100), "
 					+ "frequency Integer, "
@@ -360,8 +371,8 @@ public class dataCollection implements Runnable
 					+ "venueName varchar(100) , "
 					+ "80211mc Integer, "
 					+ "passPoint Integer, "
-					+ "PRIMARY KEY (ID) "
-					+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+					+ "FOREIGN KEY (ID) REFERENCES " + DB + '.' + TRAININGDATA + "(ID) "
+					+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci");
 			stmt.close();
 			return true;
 		}
@@ -418,34 +429,24 @@ public class dataCollection implements Runnable
 			
 			while(rs.next())
 			{
-				
-				// For each row
-				// FOr more types: 
+				// For more types: 
 				// https://docs.oracle.com/javase/8/docs/api/constant-values.html
 				for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 				{
 					int type = resultSetMetaData.getColumnType(i);
 					if (type == Types.VARCHAR || type == Types.CHAR) 
 					{
-						//System.out.println(rs.getString(i));
 						writeCSV.print(rs.getString(i));
 					}
 					else if(type == Types.FLOAT)
 					{
-						System.out.println(rs.getFloat(i));
 						writeCSV.print(rs.getFloat(i));
 					}
 					else if(type == Types.INTEGER || type == Types.REAL)
 					{
-						//System.out.println(rs.getInt(i));
 						writeCSV.print(rs.getInt(i));	
 					}
-					else
-					{
-						System.out.println("What??? " + type);
-					}
 					writeCSV.print(',');
-					// Can fill for more types, but these are all I need really...
 				}
 				writeCSV.println();
 			}
