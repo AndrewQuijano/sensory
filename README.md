@@ -10,11 +10,11 @@ The eclipse project in the *LocalizationServer* directory has the Java code to b
 **Prerequisites**:  
 1. Please create a *database.properties* file. This file will be read by the server code for setting up the database. The content should be:  
 [Database]
-user=<Username>  
-password=<password>  
-schema=<database/schema to store sensory>  
-table=<table storing iOS sensory data>  
-android=<table starting Android sensory data>  
+user=|Username|  
+password=|User password|  
+schema=|database/schema to store sensory|  
+table=|table storing iOS sensory data|  
+android=|table starting Android sensory data|  
 
 2. Be sure to set up port forwarding for your Server IP address for the phone to successfully send data.
 
@@ -43,8 +43,8 @@ Xcode 12.3 -> iPhone 12 with iOS 14.3
 1. You need to set the IP Address of where the server will collect sensory data. 
 Edit the file:  
 iOSApp/MapTemplate/config/AppSettings.swift  
-Replace <YOUR IP HERE> with  
-**https://<SERVER-IP>:<PORT-NUMBER>**
+Replace |YOUR IP HERE| with  
+**https://SERVER-IP:PORT-NUMBER**
 
 2. Open Xcode, and open the iOS/911.xcworkspace file. Opening this file ensures all the cocoa pods are loaded as expected.
 
@@ -101,10 +101,10 @@ From here it will allow you to text 911 your address and indoor location informa
 
 ## Usage - Android
 
-[Android_Map](https://github.com/AndrewQuijano/sensory/blob/master/images/android_map.jpg)
-Upon booting the Android sensory app, you will see a world map, which will zoom into your current location. 
+[Android_Map](https://github.com/AndrewQuijano/sensory/blob/master/images/android_map.png)
+screen appears on booting the Android sensory app, you will see a world map, which will zoom into your current location. 
 
-[Android_Collection](https://github.com/AndrewQuijano/sensory/blob/master/images/android_collection.jpg)
+[Android_Collection](https://github.com/AndrewQuijano/sensory/blob/master/images/android_collection.png)
 
 If you need to label the data click the *Collection Settings* button. The off switch corresponds to a 0 value and on corresponds to a 1 value for Indoors, Center of Room, and Start/Stop scanning.
 
@@ -131,7 +131,42 @@ Android devices can scan Wi-Fi access points and their RSSI signal strength. Thi
 Exit the shell, close the Java server.
 
 ## Features  
+The list of features is almost identical to the original sensory one. 
 
+| feature                      | description                                                                                                |
+|------------------------------|------------------------------------------------------------------------------------------------------------|
+| indoors                      | 1- indoors 0- outside                                                                                      |
+| created at                   | Timestamp scan completed                                                                                   |
+| session id                   | Timestamp of initial scan in session                                                                       |
+| floor                        | Floor of where user was at                                                                                 |
+| RSSI strength                | RSSI signal strength of AP connected to via Wi-Fi                                                          |
+| GPS latitude                 | Get the latitude in degrees.                                                                               |
+| GPS longitude                | Get the longitude in degrees.                                                                              |
+| GPS vertical accuracy        | Get the estimated vertical accuracy of this location in meters                                             |
+| GPS horizontal accuracy      | Get the estimated horizontal accuracy of this location (radial) in meters as the radius of 68% confidence. |
+| GPS course                   | Get the bearing in degrees.                                                                                |
+| GPS speed                    | Get the speed if it is available in meters/second over ground.                                             |
+| barometric relative altitude | Computes the Altitude in meters from the atmospheric pressure and the pressure at sea level.               |
+| barometric pressure          | Barometric pressure reading                                                                                |
+| environment context          | Details of scan                                                                                            |
+| environment mean bldg floors | Unknown                                                                                                    |
+| environment activity         | Determine a User's motion activity                                                                         |
+| city name                    | Name of city user is at                                                                                    |
+| country name                 | Name of country user is at                                                                                 |
+| magnet x                     | magentic field strength in X direction                                                                     |
+| magnet y                     | magentic field strength in Y direction                                                                     |
+| magnet z                     | magentic field strength in Z direction                                                                     |
+| magnet total                 | Total magnetic field strength                                                                              |
+
+NOTE: 
+* iOS sensory doesn't have the complete sensory table like Android does. See TODO
+* iOS sensory and Android Phones use different units when measuring barometric preassure from its sensors!  
+
+https://developer.apple.com/documentation/coremotion/cmaltitudedata  
+https://developer.android.com/guide/topics/sensors/sensors_environment  
+
+iOS devices read in kilopascals and Android reads in hectopascals.
+It seems that 1 hectopascal [hPa] = 0.1 kilopascal [kPa]
 
 ## Authors and Acknowledgment
 Code Author: Andrew Quijano  

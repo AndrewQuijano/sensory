@@ -171,7 +171,7 @@ public class Server implements Runnable
 			{
 				// Print Android Table and iPhone table
 				dataCollection.printTable(dataCollection.DB, dataCollection.TRAININGDATA);
-				//dataCollection.printTable(dataCollection.DB, login.getProperty("table"));
+				dataCollection.printTable(dataCollection.DB, login.getProperty("table"));
 			}
 			// Print the Wi-Fi Table
 			// It will have same structure as created in SST REU 2017
