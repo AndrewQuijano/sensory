@@ -29,10 +29,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import columbia.irt.sensory.R;
+
 public class GPSAltimeter implements LocationListener, Runnable
 {
     private final static String BASE_URL = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
-    private final static String API_KEY = "&key=AIzaSyBHGh1uLdcAcXl1IVqETBSh4xpDtxdveTo";
+    private final static String API_KEY = "&key=" + R.string.API_KEY;
     private final static String TAG = "MY_SENSOR";
     private final LocationManager mLocationManager;
 
