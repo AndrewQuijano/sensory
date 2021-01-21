@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 
 import columbia.irt.motion.MotionReceiver;
+import columbia.irt.sensors.AudioSensor;
 import columbia.irt.sensors.BarometricAltimeter;
 import columbia.irt.sensors.BluetoothReceiver;
 import columbia.irt.sensors.GPSAltimeter;
@@ -29,14 +30,15 @@ public class MapsActivity extends FragmentActivity
 {
     // Sensor Classes
     protected BluetoothReceiver blueWrapper;
-    protected static WifiReceiver wifi;
-    protected static BarometricAltimeter barometer;
+    protected WifiReceiver wifi;
+    protected BarometricAltimeter barometer;
     protected LightSensor light;
     protected TemperatureSensor temp;
     protected HumiditySensor humid;
-    protected static GPSAltimeter gps;
-    protected static MagneticFieldSensor magneto;
-    protected static MotionReceiver motion;
+    protected GPSAltimeter gps;
+    protected MagneticFieldSensor magneto;
+    protected MotionReceiver motion;
+    protected AudioSensor audio;
 
     protected Button collection;
     protected Button set_map;
@@ -67,6 +69,7 @@ public class MapsActivity extends FragmentActivity
         barometer = new BarometricAltimeter(my_SensorManager, gps);
         motion = new MotionReceiver(this);
         wifi = new WifiReceiver(this);
+        audio = new AudioSensor();
 
         setContentView(R.layout.activity_maps);
         // Place collection after setContent View to avoid null.
@@ -85,14 +88,15 @@ public class MapsActivity extends FragmentActivity
         super.onStart();
         gps.start();
         barometer.start();
+        magneto.start();
+        motion.register(this);
+        wifi.registerReceiver(this);
+
+        // Extra
         humid.start();
         light.start();
         temp.start();
-        magneto.start();
-        motion.register(this);
-        //File file = FileUtil.createFile(this, "temp.amr");
-        // audio.start() is implicitly called here
-        //audio.startRecord(this, file);
+        audio.startRecord(this);
     }
 
     protected void onResume()
@@ -100,17 +104,16 @@ public class MapsActivity extends FragmentActivity
         super.onResume();
         gps.start();
         barometer.start();
+        magneto.start();
+        motion.register(this);
+        wifi.registerReceiver(this);
+
+        // Extra
         humid.start();
         light.start();
         temp.start();
-        magneto.start();
-        //audio.resume();
-        motion.register(this);
-
-        if(blueWrapper != null)
-        {
-            blueWrapper.registerReceiver(this);
-        }
+        audio.resume();
+        blueWrapper.registerReceiver(this);
     }
 
     protected void onPause()
@@ -118,19 +121,16 @@ public class MapsActivity extends FragmentActivity
         super.onPause();
         gps.stop();
         barometer.stop();
+        magneto.stop();
+        motion.unregister(this);
+        wifi.registerReceiver(this);
+
+        // Extra
         humid.stop();
         light.stop();
         temp.stop();
-        magneto.stop();
-        motion.unregister(this);
-
-        // stop is implicitly called
-        // file is deleted with recording...
-        // audio.pause();
-        if(blueWrapper != null)
-        {
-            blueWrapper.unregisterReceiver(this);
-        }
+        audio.pause();
+        blueWrapper.unregisterReceiver(this);
     }
 
     protected void onDestroy()
@@ -138,20 +138,15 @@ public class MapsActivity extends FragmentActivity
         super.onDestroy();
         gps.stop();
         barometer.stop();
+        magneto.stop();
+        motion.unregister(this);
+        wifi.registerReceiver(this);
+
         humid.stop();
         light.stop();
         temp.stop();
-        magneto.stop();
-        motion.unregister(this);
-
-        // stop is implicitly called
-        // file is deleted with recording...
-        // audio.delete();
-
-        if(blueWrapper != null)
-        {
-            blueWrapper.unregisterReceiver(this);
-        }
+        audio.delete();
+        blueWrapper.unregisterReceiver(this);
     }
 
     private class collect implements View.OnClickListener

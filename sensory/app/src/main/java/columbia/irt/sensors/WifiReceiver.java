@@ -7,8 +7,6 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -21,7 +19,6 @@ import static android.widget.Toast.makeText;
 public class WifiReceiver extends BroadcastReceiver implements Runnable
 {
     private final static String TAG = "MAIN_SCANNER";
-    private final ProgressBar loading;
     private final WifiManager my_wifiManager;
     private boolean isRegistered = false;
 
@@ -33,12 +30,6 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
 
     public WifiReceiver(Context context)
     {
-        this(context, null);
-    }
-
-    public WifiReceiver(Context context, ProgressBar loading)
-    {
-        this.loading = loading;
         this.context = context;
         my_wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if(my_wifiManager == null)
@@ -97,11 +88,6 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
         }
         results = my_wifiManager.getScanResults();
         wifi_results = new WifiData(results);
-
-        if (loading != null)
-        {
-            loading.setVisibility(View.INVISIBLE);
-        }
     }
 
     public boolean startScan()

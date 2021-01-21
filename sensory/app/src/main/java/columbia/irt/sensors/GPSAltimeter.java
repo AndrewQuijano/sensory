@@ -1,5 +1,6 @@
 // Documentation suggests to check if GPS is enabled...
 // https://stuff.mit.edu/afs/sipb/project/android/docs/training/basics/location/locationmanager.html
+// Base Repo: https://github.com/aulanov/altidroid
 // https://github.com/aulanov/altidroid/blob/master/src/org/openskydive/altidroid/sensor/GPSAltimeter.java
 
 package columbia.irt.sensors;

@@ -15,10 +15,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static columbia.irt.sensory.MapsActivity.gps;
+import java.util.Objects;
+
+import columbia.irt.sensors.GPSAltimeter;
 
 public class MapView extends Fragment implements OnMapReadyCallback
 {
+    GPSAltimeter gps;
+
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -27,6 +31,7 @@ public class MapView extends Fragment implements OnMapReadyCallback
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        gps = ((MapsActivity) Objects.requireNonNull(getActivity())).gps;
         View rootView = inflater.inflate(R.layout.google_map, container, false);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         assert getFragmentManager() != null;

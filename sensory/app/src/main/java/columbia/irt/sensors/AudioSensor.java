@@ -1,16 +1,47 @@
 package columbia.irt.sensors;
 
 // Inspired by:
+// https://github.com/jeff2900/Sound-Meter
 // https://github.com/jeff2900/Sound-Meter/blob/master/app/src/main/java/com/bodekjan/soundmeter/MyMediaRecorder.java
+// Essentially my goal was to rip the audio sensor apart from GUI as much as possible.
+
 import android.content.Context;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 
 public class AudioSensor implements Runnable
 {
+    // File Util parameters
+    public static final String LOCAL = "SoundMeter";
+    public static final String LOCAL_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator;
+
+    /**
+     * Recording file directory
+     */
+    public static final String REC_PATH = LOCAL_PATH + LOCAL + File.separator;
+
+    /*
+     * Automatically create the relevant directory on the SD card
+     */
+    static {
+        File dirRootFile = new File(LOCAL_PATH);
+        if (!dirRootFile.exists())
+        {
+            dirRootFile.mkdirs();
+        }
+        File recFile = new File(REC_PATH);
+        if (!recFile.exists())
+        {
+            recFile.mkdirs();
+        }
+    }
+
+    // Audio sensor
     private final static String TAG = "MY_SENSOR";
     private MediaRecorder mRecorder = null;
 
@@ -26,6 +57,11 @@ public class AudioSensor implements Runnable
     private float minDB = 100;
     private float maxDB = 0;
     private float lastDbCount = dbCount;
+
+    public AudioSensor()
+    {
+
+    }
 
     private void setDbCount(float dbValue)
     {
@@ -86,10 +122,11 @@ public class AudioSensor implements Runnable
         this.myRecAudioFile = myRecAudioFile;
     }
 
-    public void startRecord(Context c, File fFile)
+    public void startRecord(Context context)
     {
         try
         {
+            File fFile = createFile("temp.amr");
             setMyRecAudioFile(fFile);
             if (startRecorder())
             {
@@ -98,12 +135,12 @@ public class AudioSensor implements Runnable
             }
             else
             {
-                Toast.makeText(c, "Error Starting Recorder!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Error Starting Recorder!", Toast.LENGTH_SHORT).show();
             }
         }
         catch(Exception e)
         {
-            Toast.makeText(c, "Recorder is currently Busy!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Recorder is currently Busy!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
@@ -264,5 +301,24 @@ public class AudioSensor implements Runnable
         dbCount = 0;
         lastDbCount = 0;
         maxDB = 0;
+    }
+
+    // --------------------------From FileUtil.java---------------------------------------------
+    public static File createFile(String fileName)
+    {
+        File myCaptureFile = new File(REC_PATH + fileName);
+        if (myCaptureFile.exists())
+        {
+            myCaptureFile.delete();
+        }
+        try
+        {
+            myCaptureFile.createNewFile();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return myCaptureFile;
     }
 }

@@ -30,7 +30,8 @@ import static android.hardware.SensorManager.SENSOR_STATUS_UNRELIABLE;
 public class BarometricAltimeter implements SensorEventListener, Runnable
 {
     private final static String TAG = "MY_SENSOR";
-    //private final static String URL = "http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139";
+    // Example
+    // http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=570f67646d08ce404c4cc02d3d1bb406
     private final static String URL = "http://api.openweathermap.org/data/2.5/weather?";
     private final static String API = "&appid=570f67646d08ce404c4cc02d3d1bb406";
     private final static int SENSOR_DELAY_US = 150000;  // 150ms
@@ -129,8 +130,7 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
                 String server_response;
                 int status;
                 gps.updateLocation();
-                String url = URL +"lat=" + gps.latitude + "&lon=" + gps.longitude + API;
-                Log.d(TAG, url);
+                String url = URL + "lat=" + gps.latitude + "&lon=" + gps.longitude + API;
                 HttpClient client = new DefaultHttpClient();
                 HttpGet request = new HttpGet(url);
                 HttpResponse response = client.execute(request);
@@ -166,6 +166,8 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
         }
     }
 
+    // The unit seems to be hPa for Barometric pressure.
+    // I'm unsure what the difference is between sea_level and pressure field though...
     // If you get permission denied
     // https://stackoverflow.com/questions/32994634/this-api-project-is-not-authorized-to-use-this-api-please-ensure-that-this-api
     private double parse_Sea_Level(String input) throws JSONException
@@ -175,16 +177,14 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
         JSONArray current = jObject.getJSONArray("weather");
         current_weather = current.getJSONObject(0).getString("description");
         Log.d(TAG, "Weather is now: " + current_weather);
-        /*
         try
         {
-            answer = main.getDouble("sea_level");
+            return main.getDouble("sea_level");
         }
         catch (JSONException e)
         {
             Log.d(TAG, "sea_level invalid...");
+            return main.getDouble("pressure");
         }
-        */
-        return main.getDouble("pressure");
     }
 }

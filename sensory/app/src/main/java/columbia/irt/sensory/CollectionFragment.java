@@ -28,13 +28,12 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import columbia.irt.motion.MotionReceiver;
+import columbia.irt.sensors.BarometricAltimeter;
+import columbia.irt.sensors.GPSAltimeter;
+import columbia.irt.sensors.MagneticFieldSensor;
+import columbia.irt.sensors.WifiReceiver;
 import columbia.irt.struct.FloorData;
-
-import static columbia.irt.sensory.MapsActivity.barometer;
-import static columbia.irt.sensory.MapsActivity.gps;
-import static columbia.irt.sensory.MapsActivity.magneto;
-import static columbia.irt.sensory.MapsActivity.motion;
-import static columbia.irt.sensory.MapsActivity.wifi;
 
 public class CollectionFragment extends Fragment
 {
@@ -67,6 +66,16 @@ public class CollectionFragment extends Fragment
     private int isCenter = 0;
     private FloorData f = null;
 
+    private String session_id = null;
+
+    // Sensors from Main
+    protected MapsActivity main = null;
+    private WifiReceiver wifi = null;
+    private GPSAltimeter gps = null;
+    private BarometricAltimeter barometer = null;
+    private MagneticFieldSensor magneto = null;
+    private MotionReceiver motion = null;
+
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -76,6 +85,14 @@ public class CollectionFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        main = (MapsActivity) getActivity();
+        assert main != null;
+        wifi = main.wifi;
+        gps = main.gps;
+        barometer = main.barometer;
+        magneto = main.magneto;
+        motion = main.motion;
+
         View rootView = inflater.inflate(R.layout.collection_settings, container, false);
 
         send_successful = Toast.makeText(getActivity(), "Data sent!", Toast.LENGTH_SHORT);
@@ -198,6 +215,7 @@ public class CollectionFragment extends Fragment
                 tick.cancel();
                 timerTask = null;
                 tick = null;
+                session_id = null;
             }
         }
 
@@ -206,6 +224,10 @@ public class CollectionFragment extends Fragment
             try
             {
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
+                if (session_id == null)
+                {
+                    session_id = timeStamp;
+                }
                 f = new FloorData(isIndoor, timeStamp, android_model, room.getText().toString(),
                         floor_options[floor.getValue() - 1], building.getText().toString(),
                         wifi.getConnectedMAC(), wifi.getConnectedRSSI(), isCenter,
