@@ -2,13 +2,11 @@ package columbia.irt.server;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -23,9 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class getAccessPoint implements Runnable 
-{
-	public String [] Makers;
-	
+{	
 	// SQL
 	protected final static String myDriver = "org.gjt.mm.mysql.Driver";
 	protected final static String DB = "columbia";
@@ -55,7 +51,8 @@ public class getAccessPoint implements Runnable
 			//---------------DO GET REQUEST--------------------
 			HashMap<String, Integer> Maker_freq = new HashMap<String, Integer>();
 			int last = 0;
-		
+			String manufacturer = null;
+			
 			// Now get the Manufacturer of all the AP's
 			for (int i = 0; i < APs.size(); i++)
 			{
@@ -84,44 +81,43 @@ public class getAccessPoint implements Runnable
 						}
 						continue;
 					}
-					System.out.println("\nSending 'GET' request to URL : " + url);
-					System.out.println("Response Code : " + responseCode);
-					
-					BufferedReader rd = new BufferedReader(new InputStreamReader(connect.getInputStream()));
-					String line;
-					StringBuffer response = new StringBuffer();
-					
-					while ((line = rd.readLine()) != null) 
+					else if(responseCode == 200)
 					{
-						response.append(line);
-					}
-					rd.close();
-					Makers[i] = response.toString();
-					
-					// Check frequency...
-					if(Maker_freq.get(Makers[i]) == null)
-					{
-						Maker_freq.put(Makers[i], 1);
+						BufferedReader rd = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+						String line;
+						StringBuffer response = new StringBuffer();
+						
+						while ((line = rd.readLine()) != null) 
+						{
+							response.append(line);
+						}
+						rd.close();
+						manufacturer = response.toString();
 					}
 					else
 					{
-						Maker_freq.put(Makers[i], Maker_freq.get(Makers[i]).intValue() + 1);
+						System.out.println("ERROR, NOT 200 or 429");
+						System.out.println("Sending 'GET' request to URL : " + url);
+						System.out.println("Response Code : " + responseCode);
+						continue;
+					}
+					
+					// Check frequency...
+					if(Maker_freq.get(manufacturer ) == null)
+					{
+						Maker_freq.put(manufacturer , 1);
+					}
+					else
+					{
+						Maker_freq.put(manufacturer , Maker_freq.get(manufacturer).intValue() + 1);
 					}
 					last = i;
 				}
-				catch(FileNotFoundException f)
+				catch(IOException f) 
 				{
-					Makers[i] = "NOT FOUND";
+					f.printStackTrace();
 				}
-				catch(ConnectException f)
-				{
-					Makers[i] = "NOT FOUND";
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				}
-				System.out.println("AP: " + APs.get(i) + " Company: " + Makers[i]);
+				System.out.println("AP: " + APs.get(i) + " Company: " + manufacturer);
 				Thread.sleep(1200); //No API 1 request a second, add .2 as as slack
 			}
 			
