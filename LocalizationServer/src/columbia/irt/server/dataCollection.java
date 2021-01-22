@@ -44,7 +44,6 @@ public class dataCollection implements Runnable
 	protected final static String URL = "jdbc:mysql://localhost:3306/?useSSL=false";
 
 	protected final static String APTRAIN = "Wifi";
-	protected final static String WifiLUT = "WifiLUT";
 
 	protected Socket incomingClient = null;
 
@@ -207,15 +206,9 @@ public class dataCollection implements Runnable
 			}
 			return id;
 		}
-		
-		catch(SQLException se)
+		catch(SQLException | ClassNotFoundException se)
 		{
 			se.printStackTrace();
-			return -1;
-		}
-		catch(ClassNotFoundException cnf)
-		{
-			System.err.println("Class Not Found Exception Caught");
 			return -1;
 		}
 	}
@@ -292,7 +285,7 @@ public class dataCollection implements Runnable
 	 * 4- Create the Wi-Fi Table for Android sensory
 	 * @return 
 	 * true: successfully initialized
-	 * false: failed, might alraedy by there though
+	 * false: failed, might already by there though
 	 * 
 	 * References:
 	 * https://stackoverflow.com/questions/39463134/how-to-store-emoji-character-in-mysql-database
@@ -393,7 +386,7 @@ public class dataCollection implements Runnable
 	 * @param database - (String) Name of Database/Scheme 
 	 * @param table - (String) Name of table you want to print to CSV
 	 */
-	public static void printTable(String database, String table)
+	public static void printTable(String database, String table, boolean has_mac_columns)
 	{
 		List<String> columns = new ArrayList<String>();
 		String header = "";
@@ -410,7 +403,14 @@ public class dataCollection implements Runnable
 			rs = st.executeQuery();
 			while (rs.next())
 			{
-				columns.add(rs.getString("Field"));
+				if(has_mac_columns)
+				{
+					columns.add(getColumnName(rs.getString("Field")));
+				}
+				else
+				{
+					columns.add(rs.getString("Field"));
+				}
 			}
 			header = columns.stream().collect(Collectors.joining(","));
 			
@@ -465,17 +465,6 @@ public class dataCollection implements Runnable
 			e.printStackTrace();
 		}
 	}
-
-
-	/**
-	 * Build a new MySQL table to train a Wi-Fi classifier
-	 * The Columns will be comprised of the most frequently seen MAC Addresses
-	 * @throws IOException
-	 */
-	public static List<String> getMACAddressRows(double precent)
-	{
-		return null;
-	}
 	
 	/**
 	 * 
@@ -492,19 +481,20 @@ public class dataCollection implements Runnable
 			
 			/*
 			 * SELECT MACADDRESS, COUNT(MACADDRESS) AS count
-			 * FROM <Schema>.<Wifi-Table>
-			 * WHERE Building = <Building for Classifier?>
+			 * FROM sensory.wifi
+			 * WHERE Building = "West 118th Street"
 			 * GROUP BY MACADDRESS
 			 * ORDER BY count DESC
 			 * LIMIT 20;
 			 */
 			PreparedStatement state = conn.prepareStatement(
 					"SELECT MACADDRESS, Count(MACADDRESS) as count "
-					+ "from " + DB + "." + TRAININGDATA + " "
-					+ "Where Map= ?"
+					+ "from " + DB + "." + APTRAIN + " "
+					+ "Where Building = ? "
 					+ "group by MACADDRESS "
 					+ "ORDER BY count DESC LIMIT " + frequency + ";");
 			state.setString(1, building);
+			//System.out.println(state.toString());
 			ResultSet rs = state.executeQuery();
 			while (rs.next())
 			{
@@ -539,20 +529,28 @@ public class dataCollection implements Runnable
 			Statement stmt = conn.createStatement();
 			
 			// BUILD ONE TABLE FOR THE BUILDING
-			// Cols: Room, Floor, <MAC ADDRESSES>
+			// Columns: Room, Floor, <MAC ADDRESSES>
 			String sql =
-					"CREATE TABLE " + DB + ".Wifi-" + building +
+					"CREATE TABLE IF NOT EXISTS " + DB + "." + building +
 					"("
+					+ " ID Integer not NULL, "
 					+ " Room Text not NULL, "
 					+ " Floor Text not NULL, ";
 			String add = "";
 			for (int i = 0; i < MAC_Address.size(); i++)
 			{
-				add += makeColumnName(MAC_Address.get(i)) + " INTEGER not NULL,";
+				if(i != MAC_Address.size() - 1)
+				{
+					add += " " + makeColumnName(MAC_Address.get(i)) + " INTEGER not NULL, ";
+				}
+				else
+				{
+					add += " " + makeColumnName(MAC_Address.get(i)) + " INTEGER not NULL";
+				}
 			}
-				
 			sql += add;
-			sql +=");"; 
+			sql +=");";
+			//System.out.println(sql);
 			stmt.executeUpdate(sql);	
 			return true;
 		}
@@ -599,8 +597,8 @@ public class dataCollection implements Runnable
 		}
 	}
 
-	// All Column names in MySQL can't start with a number
-	// So if the MAC Address starts with 1 - 9, swap it!
+	// Undoes the effect of "makeColumnName()"
+	// Use this to get Column MAC Addresses for printing or something
 	protected static String getColumnName(String column)
 	{
 		String answer = "";
@@ -611,16 +609,16 @@ public class dataCollection implements Runnable
 		char first = column.charAt(0);
 		// NOTE WE DO REVERSE THIS TIME
 		// Map the following -> (Jump 65)
-		// 0 (48) --> q (113)
-		// 1 (49) --> r (114)
-		// 2 (50) --> s (115)
-		// 3 (51) --> t (116)
-		// 4 (52) --> u (117)
-		// 5 (53) --> v (118)
-		// 6 (54) --> w (119)
-		// 7 (55) --> x (120)
-		// 8 (56) --> y (121)
-		// 9 (57) --> z (122)
+		// 0 q (113) --> (48)
+		// 1 r (114) --> (49)
+		// 2 s (115) --> (50)
+		// 3 t (116) --> (51)
+		// 4 u (117) --> (52)
+		// 5 v (118) --> (53)
+		// 6 w (119) --> (54)
+		// 7 x (120) --> (55)
+		// 8 y (121) --> (56)
+		// 9 z (122) --> (57)
 		// If the first character in set [q, z] then -65 to get correct MAC back
 		if("qrstuvwxyz".indexOf(first) != -1)
 		{
@@ -636,9 +634,165 @@ public class dataCollection implements Runnable
 		}
 	}
 
-	public static boolean updateTable()
+	
+	// select distinct ID FROM sensory.wifi
+	public static List<Integer> getScanList()
 	{
-		return true;
+		List<Integer> ids = new ArrayList<Integer>();
+		try
+		{
+			Class.forName(myDriver);
+			Connection conn = DriverManager.getConnection(URL, username, password);
+			String query = "SELECT distinct ID FROM " + DB + '.' + APTRAIN + ";";
+			PreparedStatement st = conn.prepareStatement(query);
+			st.execute();
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next())
+			{
+				ids.add(rs.getInt(1));
+			}
+			return ids;
+		}
+		catch(SQLException | ClassNotFoundException se)
+		{
+			se.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	// Fill this for a lookup table for building
+	public static boolean updateTable(String building, List<String> mac_columns)
+	{
+		try
+		{
+			Class.forName(myDriver);
+			Connection conn = DriverManager.getConnection(URL, username, password);
+			PreparedStatement stmt;
+			
+			// Collect the Data needed for RSS
+			String RSS_query;
+			ResultSet rs;
+			
+			// Get All Scan IDs
+			List<Integer> ids = getScanList();
+			List<String> rooms = new ArrayList<String>();
+			List<String> floors = new ArrayList<String>();
+			int [][] rssi_table = new int [ids.size()][mac_columns.size()];
+			
+			// Iterate over all ScanIDs
+			for (int x = 0; x < ids.size(); x++)
+			{
+				/*
+				select RSS FROM sensory.wifi
+				WHERE MACADDRESS = 'f4:f2:6d:f9:e8:85'
+				and ID=1089;
+				 */
+				// Iterate over every MAC Address column in the Lookup Table
+				for (int currentCol = 0; currentCol < mac_columns.size(); currentCol++)
+				{
+					RSS_query = "SELECT Room, Floor, RSS FROM " + DB + "." + APTRAIN + " "
+							+ " WHERE MACADDRESS = ? "
+							+ " AND ID = ? "
+							+ ";";
+								
+					stmt = conn.prepareStatement(RSS_query);
+					stmt.setString(1, mac_columns.get(currentCol));
+					stmt.setInt(2, ids.get(x));
+					rs = stmt.executeQuery();
+					while (rs.next())
+					{
+						rssi_table[x][currentCol] = rs.getInt("RSS");
+						rooms.add(rs.getString("Room"));
+						floors.add(rs.getString("Floor"));
+					}
+					
+					//CHECK IF I GOT A NULL!
+					if (rssi_table[x][currentCol] == 0)
+					{
+						rssi_table[x][currentCol] = -120;
+					}
+					stmt.close();		
+				}
+			}
+			
+			// Set up the Query to update the Lookup Table
+			String append = "";
+			for (int i = 0; i < mac_columns.size(); i++)
+			{
+				append += " ?,";
+			}
+			//Remove the Extra , at the end!!
+			append = append.substring(0, append.length() - 1);
+			append += ");";
+			
+			//The Insert Statement for Plain Text
+			String PlainQuery = "insert into " + DB + "." + building
+			+ " values (?, ?, ?, " + append;
+			
+			
+			// Submit the data into the SQL Lookup table
+			// Iterate through all ScanIDs
+			for (int i = 0; i < ids.size(); i++)
+			{
+				if(isNullTuple(rssi_table[i]))
+				{
+					continue;
+				}
+				stmt = conn.prepareStatement(PlainQuery);
+				
+				// Fill up the PlainText Table Part 1
+				stmt.setInt (1, ids.get(i)); 		//ScanID, just in case...
+				stmt.setString(2, rooms.get(i)); 	// Room
+				stmt.setString(3, floors.get(i));	// Floor
+				
+				for (int j = 0; j < mac_columns.size();j++)
+				{
+					stmt.setInt((j + 4), rssi_table[i][j]);
+				}
+				stmt.execute();
+				stmt.close();
+			}
+
+			// DON'T FORGET TO COMMIT!!!
+			stmt = conn.prepareStatement("commit;");
+			stmt.executeQuery();
+			conn.close();
+			return true;
+		}
+		catch(SQLException | ClassNotFoundException se)
+		{
+			se.printStackTrace();
+			return false;
+		}	
+	}
+	
+	/*	
+ 	Input: A Row of size 10 of RSS values
+ 	
+ 	Purpose of Method: 
+ 	The lookup table shouldn't have any points consisting of all RSS = -120
+ 	That can cause errors. 
+ 	To avoid this, if a row is detect full of nulls, return true.
+ 	If it returns true, the Insert into Lookup Tables will omit this row.
+	Potential Errors:
+	
+	Returns:
+	True/False to UpdateTables()
+	*/
+	
+	public static boolean isNullTuple(int [] row)
+	{
+		int counter = 0;
+		for (int i = 0; i < row.length; i++)
+		{
+			if (row[i] == -120)
+			{
+				++counter;
+			}
+		}
+		return counter == row.length;
 	}
 	
 	private void closeClientConnection() throws IOException

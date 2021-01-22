@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -148,41 +149,84 @@ public class Server implements Runnable
 		
 		while(true)
 		{
-			String input = inputReader.nextLine();
-			input = input.trim();
-			String [] commands = input.split(" ");
-			
-			// Clear CLI
-			if (commands[0].equalsIgnoreCase("clr") || commands[0].equalsIgnoreCase("clear"))
-			{	
-				System.out.println("\033[H\033[2J");
-				System.out.flush();
-			}				
-			// Get AP Manufacturer Based on MAC Address
-			else if(commands[0].equalsIgnoreCase("AP"))
+			try
 			{
-				getAccessPoint AP = new getAccessPoint();
-				(new Thread(AP)).start();
-				// t.join();
-				// AP.Makers;
-			}
-			// Print the entire sensory table
-			else if(commands[0].equalsIgnoreCase("sensory"))
-			{
-				// Print Android Table and iPhone table
-				dataCollection.printTable(dataCollection.DB, dataCollection.TRAININGDATA);
-				dataCollection.printTable(dataCollection.DB, login.getProperty("table"));
-			}
-			// Print the Wi-Fi Table
-			// It will have same structure as created in SST REU 2017
-			else if(commands[0].equalsIgnoreCase("wifi"))
-			{
+				String input = inputReader.nextLine();
+				input = input.trim();
+				String [] commands = input.split(" ");
 				
+				// Clear CLI
+				if (commands[0].equalsIgnoreCase("clr") || commands[0].equalsIgnoreCase("clear"))
+				{	
+					System.out.println("\033[H\033[2J");
+					System.out.flush();
+				}				
+				// Get AP Manufacturer Based on MAC Address
+				else if(commands[0].equalsIgnoreCase("AP"))
+				{
+					getAccessPoint AP = new getAccessPoint();
+					(new Thread(AP)).start();
+					// t.join();
+					// AP.Makers;
+				}
+				// Print the entire sensory table
+				else if(commands[0].equalsIgnoreCase("sensory"))
+				{
+					// Print Android Table and iPhone table
+					dataCollection.printTable(dataCollection.DB, dataCollection.TRAININGDATA, false);
+					dataCollection.printTable(dataCollection.DB, login.getProperty("table"), false);
+				}
+				// Print the Wi-Fi Table
+				// It will have same structure as created in SST REU 2017
+				else if(commands[0].equalsIgnoreCase("wifi"))
+				{
+					if(commands.length <= 2)
+					{
+						continue;
+					}
+					int limit = Integer.parseInt(commands[1]);
+					String building = commands[2]; //get all other args as part of building 
+					for(int i = 3; i < commands.length; i++)
+					{
+						building += " ";
+						building += commands[i];
+					}
+					// System.out.println("Building: " + building + " int: " + limit);
+					List<String> mac = dataCollection.getMACAddressRows(building, limit);
+					String table = building.replace(" ", "_");
+					/*
+					for (int i = 0; i < mac.size(); i++)
+					{
+						System.out.println(mac.get(i));
+					}
+					*/
+
+					if(dataCollection.createTables(table, mac))
+					{
+						if(dataCollection.updateTable(table, mac))
+						{
+							System.out.println("Successfully created Wifi Lookup Table...printing it!");
+							dataCollection.printTable(dataCollection.DB, table, true);
+						}
+						else
+						{
+							System.out.println("Failed to update Look up Table");
+						}
+					}
+					else
+					{
+						System.out.println("Failed to Create Look up table!");
+					}
+				}
+				// Exit the shell
+				else if (commands[0].equalsIgnoreCase("exit"))
+				{
+					break;
+				}
 			}
-			// Exit the shell
-			else if (commands[0].equalsIgnoreCase("exit"))
+			catch(NumberFormatException e)
 			{
-				break;
+				continue;
 			}
 		}
 		inputReader.close();
