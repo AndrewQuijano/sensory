@@ -101,14 +101,10 @@ public class Server implements Runnable
 			{
 			    login.load(in);
 			}
-			dataCollection.username = login.getProperty("user");
-			dataCollection.password = login.getProperty("password");
-			dataCollection.DB = login.getProperty("schema");
-			dataCollection.TRAININGDATA = login.getProperty("android");
-			
-			
-			getAccessPoint.username = login.getProperty("user");
-			getAccessPoint.password = login.getProperty("password");
+			SqlConfiguration.username = login.getProperty("user");
+			SqlConfiguration.password = login.getProperty("password");
+			SqlConfiguration.DB = login.getProperty("schema");
+			SqlConfiguration.TRAININGDATA = login.getProperty("android");
 			
 			// Custom Port if needed?
 			if (args.length == 1)

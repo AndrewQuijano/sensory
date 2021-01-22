@@ -27,23 +27,11 @@ import columbia.irt.struct.FloorData;
 import columbia.irt.struct.WifiData;
 
 
-public class dataCollection implements Runnable
+public class dataCollection extends SqlConfiguration implements Runnable
 {
-	// SQL Login and parameters
-	protected static String username = "";
-	protected static String password = "";
-	protected static String DB = "";
-	protected static String TRAININGDATA = "";
-
 	// I/O
 	private ObjectInputStream fromClient = null;
 	private ObjectOutputStream toClient = null;
-
-	// SQL
-	protected final static String myDriver = "org.gjt.mm.mysql.Driver";
-	protected final static String URL = "jdbc:mysql://localhost:3306/?useSSL=false";
-
-	protected final static String APTRAIN = "Wifi";
 
 	protected Socket incomingClient = null;
 

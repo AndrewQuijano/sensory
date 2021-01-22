@@ -20,16 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class getAccessPoint implements Runnable 
-{	
-	// SQL
-	protected final static String myDriver = "org.gjt.mm.mysql.Driver";
-	protected final static String DB = "columbia";
-	protected final static String URL = "jdbc:mysql://localhost:3306/?useSSL=false";
-	protected final static String APTRAIN = "Wifi";
-	protected static String username = "";
-	protected static String password = "";
-	
+public class getAccessPoint extends SqlConfiguration implements Runnable 
+{
 	public void run() 
 	{
 		// Should be done before Lookup Tables are made...
