@@ -511,6 +511,62 @@ public class dataCollection implements Runnable
 		}
 		return common_aps;
 	}
+	
+	/**
+	 * Create a frequency map of detected Access Points.
+	 * The purpose is to allow the user to know how many Access Points to filter.
+	 */
+	public static void getMACAddressFrequencyMap(String building)
+	{
+		PrintWriter writeCSV = null;
+		try
+		{
+			Class.forName(myDriver);
+			Connection conn = DriverManager.getConnection(URL, username, password);
+			
+			/*
+			 * SELECT MACADDRESS, COUNT(MACADDRESS) AS count
+			 * FROM sensory.wifi
+			 * WHERE Building = "West 118th Street"
+			 * GROUP BY MACADDRESS
+			 * ORDER BY count DESC
+			 */
+			PreparedStatement state = conn.prepareStatement(
+					"SELECT MACADDRESS, Count(MACADDRESS) as count "
+					+ "from " + DB + "." + APTRAIN + " "
+					+ "Where Building = ? "
+					+ "group by MACADDRESS "
+					+ "ORDER BY count DESC;");
+			state.setString(1, building);
+			//System.out.println(state.toString());
+			ResultSet rs = state.executeQuery();
+			
+			// Print the values to a CSV file
+			writeCSV = new PrintWriter(
+					new BufferedWriter(
+							new OutputStreamWriter(
+									new FileOutputStream("access-point-frequency.csv"))));
+			writeCSV.println("Access Point,Frequency");
+			
+			while (rs.next())
+			{
+				writeCSV.println(rs.getString("MACADDRESS") + ',' + rs.getString("count"));
+			}
+			writeCSV.close();
+		}
+		catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		} 
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 
 	/**

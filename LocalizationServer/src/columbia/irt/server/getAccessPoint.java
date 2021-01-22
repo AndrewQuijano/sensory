@@ -1,9 +1,13 @@
 package columbia.irt.server;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -16,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class getAccessPoint implements Runnable 
 {
@@ -34,22 +39,20 @@ public class getAccessPoint implements Runnable
 		// Should be done before Lookup Tables are made...
 		// Get all APs from MySQL database
 		
-		ArrayList<String> APs = new ArrayList<String>();
+		List<String> APs = new ArrayList<String>();
 		try 
 		{
 			Class.forName(myDriver);
 			Connection conn = DriverManager.getConnection(URL, username, password);
 			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery("SELECT MACAddress from " + DB + "." + APTRAIN + ";");
+			ResultSet rs = st.executeQuery("SELECT distinct MACAddress from " + DB + "." + APTRAIN + ";");
 			
 			while (rs.next())
 			{
-				// Note to self: DO NOT USE FOR LOOPS!! 
 				APs.add(rs.getString("MACADDRESS"));
 			}
 			
 			//---------------DO GET REQUEST--------------------
-			Makers = new String[APs.size()];
 			HashMap<String, Integer> Maker_freq = new HashMap<String, Integer>();
 			int last = 0;
 		
@@ -72,7 +75,6 @@ public class getAccessPoint implements Runnable
 					// Too many requests, SLOW DOWN AND TRY AGAIN!
 					if(responseCode == 429)
 					{
-						System.err.println("TOO MANY REQUESTS SENT!");
 						Thread.sleep(2400);
 						--i;
 						// If I backtrack too much, just bail!
@@ -97,7 +99,7 @@ public class getAccessPoint implements Runnable
 					Makers[i] = response.toString();
 					
 					// Check frequency...
-					if(Maker_freq.get(Makers[i])==null)
+					if(Maker_freq.get(Makers[i]) == null)
 					{
 						Maker_freq.put(Makers[i], 1);
 					}
@@ -119,10 +121,23 @@ public class getAccessPoint implements Runnable
 				{
 					e.printStackTrace();
 				}
-				System.out.println("Manufacturer: " + i + " Company: " + Makers[i]);
-				Thread.sleep(1200);//No API 1 request a second, add .2 as as slack
+				System.out.println("AP: " + APs.get(i) + " Company: " + Makers[i]);
+				Thread.sleep(1200); //No API 1 request a second, add .2 as as slack
 			}
-			//sdataCollection.printHashMap(Maker_freq);
+			
+			// Print to CSV
+			PrintWriter writeCSV = new PrintWriter(
+					new BufferedWriter(
+							new OutputStreamWriter(
+									new FileOutputStream("manufacturer-frequency.csv"))));
+			writeCSV.println("Manufacturer,Frequency");
+			
+			for (String key: Maker_freq.keySet())
+			{
+	            Integer value = Maker_freq.get(key);  
+	            writeCSV.println(key + "," + value);  
+			}
+			writeCSV.close();
 		}
 		catch (ClassNotFoundException e) 
 		{

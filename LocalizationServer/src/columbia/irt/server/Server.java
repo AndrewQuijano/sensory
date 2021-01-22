@@ -162,12 +162,11 @@ public class Server implements Runnable
 					System.out.flush();
 				}				
 				// Get AP Manufacturer Based on MAC Address
+				// It will also print a Frequency map on it
 				else if(commands[0].equalsIgnoreCase("AP"))
 				{
 					getAccessPoint AP = new getAccessPoint();
 					(new Thread(AP)).start();
-					// t.join();
-					// AP.Makers;
 				}
 				// Print the entire sensory table
 				else if(commands[0].equalsIgnoreCase("sensory"))
@@ -194,12 +193,6 @@ public class Server implements Runnable
 					// System.out.println("Building: " + building + " int: " + limit);
 					List<String> mac = dataCollection.getMACAddressRows(building, limit);
 					String table = building.replace(" ", "_");
-					/*
-					for (int i = 0; i < mac.size(); i++)
-					{
-						System.out.println(mac.get(i));
-					}
-					*/
 
 					if(dataCollection.createTables(table, mac))
 					{
@@ -217,6 +210,20 @@ public class Server implements Runnable
 					{
 						System.out.println("Failed to Create Look up table!");
 					}
+				}
+				else if(commands[0].equalsIgnoreCase("frequency"))
+				{
+					if(commands.length <= 1)
+					{
+						continue;
+					}
+					String building = commands[1]; //get all other args as part of building 
+					for(int i = 2; i < commands.length; i++)
+					{
+						building += " ";
+						building += commands[i];
+					}
+					dataCollection.getMACAddressFrequencyMap(building);
 				}
 				// Exit the shell
 				else if (commands[0].equalsIgnoreCase("exit"))
