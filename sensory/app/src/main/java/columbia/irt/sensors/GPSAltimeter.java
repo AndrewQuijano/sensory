@@ -110,6 +110,7 @@ public class GPSAltimeter implements LocationListener, Runnable
         {
             vAccuracy = -1;
         }
+
         course = loc.getBearing();
         speed = loc.getSpeed();
 
@@ -169,6 +170,9 @@ public class GPSAltimeter implements LocationListener, Runnable
         {
             vAccuracy = -1;
         }
+
+        course = location.getBearing();
+        speed = location.getSpeed();
         try
         {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
