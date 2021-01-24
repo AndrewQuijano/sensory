@@ -96,8 +96,6 @@ public class GPSAltimeter implements LocationListener, Runnable
 
     public void onLocationChanged(Location loc)
     {
-        Log.d(TAG, "LOCATION CHANGED Longitude: " + loc.getLongitude());
-        Log.d(TAG, "LOCATION CHANGED Latitude: " + loc.getLatitude());
         longitude = loc.getLongitude();
         latitude = loc.getLatitude();
         hAccuracy = loc.getAccuracy();
@@ -161,7 +159,6 @@ public class GPSAltimeter implements LocationListener, Runnable
         longitude = location.getLongitude();
         latitude = location.getLatitude();
         hAccuracy = location.getAccuracy();
-        Log.d(TAG, "Build is: " + Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             vAccuracy = location.getVerticalAccuracyMeters();
