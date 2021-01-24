@@ -103,12 +103,12 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			
 			String SQL = "insert into " + DB + "." + TRAININGDATA + " "
 					+ "values "
-					+ "(default, "					// Primary Key, already done for you!
-					+ "?, ?, ?, ?, ?, ?, ?, ?, ?, "	// 9 Classes
-					+ "?, ?, ?, ?, ?, ?, ?, "		// 7 GPS
-					+ "?, ?, ?, "					// 3 barometric
-					+ "?, ?, ?, ?, ?, "				// 5 env features
-					+ "?, ?, ?, ?"					// 4 Magnetic field
+					+ "(default, "						// Primary Key, already done for you!
+					+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "	// 10 Classes
+					+ "?, ?, ?, ?, ?, ?, ?, "			// 7 GPS
+					+ "?, ?, ?, "						// 3 barometric
+					+ "?, ?, ?, ?, ?, "					// 5 env features
+					+ "?, ?, ?, ?"						// 4 Magnetic field
 					+ ");";
 
 			// Fill up Regular Data set based on sensory
@@ -117,40 +117,41 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			// (5) Fill up Indoors/Created At/Device ID/Floor/RSSI
 			insert.setInt(1, input.getIndoors());
 			insert.setString(2, input.created_at());
-			insert.setString(3, input.device_id());
-			insert.setString(4, input.room());
-			insert.setInt(5, Integer.parseInt(input.floor()));
-			insert.setString(6, input.building());
-			insert.setString(7, input.connected_ap());
-			insert.setInt(8, input.rssi_strength());
-			insert.setInt(9, input.is_center());
+			insert.setString(3, input.session_id());
+			insert.setString(4, input.device_id());
+			insert.setString(5, input.room());
+			insert.setInt(6, Integer.parseInt(input.floor()));
+			insert.setString(7, input.building());
+			insert.setString(8, input.connected_ap());
+			insert.setInt(9, input.rssi_strength());
+			insert.setInt(10, input.is_center());
 			
 			// (6) Fill up GPS
-			insert.setDouble(10, input.gps_alt());
-			insert.setDouble(11, input.gps_longitude());
-			insert.setDouble(12, input.gps_latitude());
-			insert.setDouble(13, input.gps_vertical_accuracy());
-			insert.setDouble(14, input.gps_horizontal_accuracy());
-			insert.setDouble(15, input.gps_course());
-			insert.setDouble(16, input.gps_speed());
+			insert.setDouble(11, input.gps_alt());
+			insert.setDouble(12, input.gps_longitude());
+			insert.setDouble(13, input.gps_latitude());
+			insert.setDouble(14, input.gps_vertical_accuracy());
+			insert.setDouble(15, input.gps_horizontal_accuracy());
+			insert.setDouble(16, input.gps_course());
+			insert.setDouble(17, input.gps_speed());
 			
 			// (3) Barometric
-			insert.setDouble(17, input.sea_level());
-			insert.setDouble(18, input.barometric_pressure());
-			insert.setDouble(19, input.barometric_relative_altitude());
+			insert.setDouble(18, input.sea_level());
+			insert.setDouble(19, input.barometric_pressure());
+			insert.setDouble(20, input.barometric_relative_altitude());
 			
 			// (5) Environment
-			insert.setString(20, input.environment_context());
 			insert.setString(21, input.environment_context());
-			insert.setString(22, input.environment_mean_bldg_floors());
-			insert.setString(23, input.city_name());
-			insert.setString(24, input.country_name());
-			
+			insert.setString(22, input.environment_context());
+			insert.setString(23, input.environment_mean_bldg_floors());
+			insert.setString(24, input.city_name());
+			insert.setString(25, input.country_name());
+		
 			// (4) Fill up Magnetic Field
-			insert.setDouble(25, input.magnet_x_mt());
-			insert.setDouble(26, input.magnet_y_mt());
-			insert.setDouble(27, input.magnet_z_mt());
-			insert.setDouble(28, input.magnet_total());	
+			insert.setDouble(26, input.magnet_x_mt());
+			insert.setDouble(27, input.magnet_y_mt());
+			insert.setDouble(28, input.magnet_z_mt());
+			insert.setDouble(29, input.magnet_total());	
 			
 			//System.out.println(SQL);
 			
@@ -287,7 +288,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 		try
 		{
 			Class.forName(myDriver);
-			System.out.println("Connecting to a local database...");
+			//System.out.println("Connecting to a local database...");
 			Connection conn = DriverManager.getConnection(URL, username, password);
 			stmt = conn.createStatement();
 			
@@ -299,6 +300,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					"  `ID` int NOT NULL AUTO_INCREMENT, " + 
 					"  `indoors` int DEFAULT NULL, " + 
 					"  `created_at` varchar(100) NOT NULL, " + 
+					"  `session_id` varchar(100) NOT NULL, " + 
 					"  `device_id` varchar(100) NOT NULL, " + 
 					"  `room` varchar(100) NOT NULL, " + //new
 					"  `floor` int DEFAULT NULL, " + 

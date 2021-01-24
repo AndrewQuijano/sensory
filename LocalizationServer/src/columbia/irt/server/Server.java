@@ -147,6 +147,7 @@ public class Server implements Runnable
 		{
 			try
 			{
+				System.out.print("sensory-server>");
 				String input = inputReader.nextLine();
 				input = input.trim();
 				String [] commands = input.split(" ");
