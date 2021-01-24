@@ -49,8 +49,9 @@ public class FloorData implements Serializable
 			String room, String floor, String building, String connected_ap,
 			int rssi_strength, int is_center, double gps_alt, double gps_latitude,
 			double gps_longitude, double gps_vertical_accuracy, double gps_horizontal_accuracy,
-			double gps_course, double gps_speed, double barometric_relative_altitude,
-			double sea_level, double barometric_pressure, String environment_context, String environment_mean_bldg_floors,
+			double gps_course, double gps_speed,
+			double sea_level, double barometric_pressure, double barometric_relative_altitude,
+			String environment_context, String environment_mean_bldg_floors,
 			String environment_activity, String city_name, String country_name,
 			double magnet_x_mt, double magnet_y_mt, double magnet_z_mt, WifiData result
 	)
