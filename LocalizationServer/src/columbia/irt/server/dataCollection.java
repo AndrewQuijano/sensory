@@ -316,8 +316,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					"  `gps_course` float DEFAULT NULL, " + 
 					"  `gps_speed` float DEFAULT NULL, " + 
 					"  `baro_sea_level` float DEFAULT NULL, " + // new
-					"  `baro_relative_altitude` float DEFAULT NULL, " + 
 					"  `baro_pressure` float DEFAULT NULL, " + 
+					"  `baro_relative_altitude` float DEFAULT NULL, " + 
 					"  `env_context` varchar(100) DEFAULT NULL, " + 
 					"  `env_mean_bldg_floors` varchar(100) DEFAULT NULL, " + 
 					"  `env_activity` varchar(100) DEFAULT NULL, " + 

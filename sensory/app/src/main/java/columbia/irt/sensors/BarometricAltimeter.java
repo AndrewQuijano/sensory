@@ -131,6 +131,7 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
                 int status;
                 gps.updateLocation();
                 String url = URL + "lat=" + gps.latitude + "&lon=" + gps.longitude + API;
+                Log.d(TAG, url);
                 HttpClient client = new DefaultHttpClient();
                 HttpGet request = new HttpGet(url);
                 HttpResponse response = client.execute(request);

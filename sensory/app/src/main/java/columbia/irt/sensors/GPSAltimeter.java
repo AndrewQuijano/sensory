@@ -30,12 +30,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import columbia.irt.sensory.R;
-
 public class GPSAltimeter implements LocationListener, Runnable
 {
     private final static String BASE_URL = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
-    private final static String API_KEY = "&key=" + R.string.API_KEY;
+    //private final static String API_KEY = "&key=" + R.string.API_KEY;
+    private final static String API_KEY = "&key=AIzaSyBYJbhGFl17ejbVxeiqlcoSk2epVB3ALd0";
     private final static String TAG = "MY_SENSOR";
     private final LocationManager mLocationManager;
 
@@ -162,6 +161,7 @@ public class GPSAltimeter implements LocationListener, Runnable
         longitude = location.getLongitude();
         latitude = location.getLatitude();
         hAccuracy = location.getAccuracy();
+        Log.d(TAG, "Build is: " + Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             vAccuracy = location.getVerticalAccuracyMeters();
@@ -180,7 +180,7 @@ public class GPSAltimeter implements LocationListener, Runnable
             env_context = addresses.get(0).getFeatureName();
             city_name = addresses.get(0).getLocality();
             country_name = addresses.get(0).getCountryName();
-            Log.d(TAG, city_name + country_name);
+            Log.d(TAG, address + "," + env_context + "," + city_name + "," + country_name);
         }
         catch (IOException e)
         {
@@ -213,7 +213,8 @@ public class GPSAltimeter implements LocationListener, Runnable
 
     public void run()
     {
-        // Sources: https://stackoverflow.com/questions/34691175/how-to-send-httprequest-and-get-json-response-in-android
+        // Sources:
+        // https://stackoverflow.com/questions/34691175/how-to-send-httprequest-and-get-json-response-in-android
         // https://developers.google.com/maps/documentation/elevation/intro
         while(isThreadRunning)
         {
@@ -240,7 +241,7 @@ public class GPSAltimeter implements LocationListener, Runnable
                 if(status == 200)
                 {
                     server_response = EntityUtils.toString(response.getEntity());
-                    altitude = parseAltitude(server_response);
+                    this.altitude = parseAltitude(server_response);
                 }
                 else
                 {
@@ -248,8 +249,8 @@ public class GPSAltimeter implements LocationListener, Runnable
                 }
                 // Update every 3 minutes
                 Thread.sleep(10*60*1000);
-                // Log.d(TAG, "Completed updating altitude from sea level!");
-                // Log.d(TAG, "altitude: " + altitude);
+                Log.d(TAG, "Completed updating altitude from sea level!");
+                Log.d(TAG, "altitude: " + altitude);
             }
             catch (JSONException e)
             {
