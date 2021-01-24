@@ -141,7 +141,7 @@ public class CollectionFragment extends Fragment
     {
         gps.start();
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
-        f = new FloorData(isIndoor, timeStamp, android_model, room.getText().toString(),
+        f = new FloorData(isIndoor, timeStamp, session_id, android_model, room.getText().toString(),
                 floor_options[floor.getValue() - 1], building.getText().toString(),
                 wifi.getConnectedMAC(), wifi.getConnectedRSSI(), this.isCenter,
                 gps.altitude,
@@ -228,7 +228,7 @@ public class CollectionFragment extends Fragment
                 {
                     session_id = timeStamp;
                 }
-                f = new FloorData(isIndoor, timeStamp, android_model, room.getText().toString(),
+                f = new FloorData(isIndoor, timeStamp, session_id, android_model, room.getText().toString(),
                         floor_options[floor.getValue() - 1], building.getText().toString(),
                         wifi.getConnectedMAC(), wifi.getConnectedRSSI(), isCenter,
                         gps.altitude,

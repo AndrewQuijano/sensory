@@ -10,6 +10,7 @@ public class FloorData implements Serializable
 	private final int indoors;
 	// Time of scan
 	private final String created_at;
+	private final String session_id;
 	// Time scan started, but oops got device ID though
 	private final String device_id;
 	private final String room;
@@ -44,7 +45,7 @@ public class FloorData implements Serializable
 	// This is only for Sensory functionality
 	// Fill data from sensors
 	public FloorData(
-			int indoors, String created_at, String device_id,
+			int indoors, String created_at, String session_id, String device_id,
 			String room, String floor, String building, String connected_ap,
 			int rssi_strength, int is_center, double gps_alt, double gps_latitude,
 			double gps_longitude, double gps_vertical_accuracy, double gps_horizontal_accuracy,
@@ -57,6 +58,7 @@ public class FloorData implements Serializable
 		// Table has ID as auto-incremented private key
 		this.indoors = indoors;
 		this.created_at = created_at;
+		this.session_id = session_id;
 		this.device_id = device_id;
 		this.room = room;
 		this.floor = floor;
@@ -100,7 +102,11 @@ public class FloorData implements Serializable
 		return this.created_at;
 	}
 
-	// Time scan started
+	public String session_id()
+	{
+		return this.session_id;
+	}
+
 	public String device_id()
 	{
 		return this.device_id;
@@ -241,6 +247,8 @@ public class FloorData implements Serializable
 		return String.valueOf(this.getIndoors()) +
 				',' +
 				this.created_at() +
+				',' +
+				this.session_id() +
 				',' +
 				this.device_id() +
 				',' +
