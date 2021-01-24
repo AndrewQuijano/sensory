@@ -74,9 +74,11 @@ public class FloorData implements Serializable
 		this.gps_horizontal_accuracy = gps_horizontal_accuracy;
 		this.gps_course = gps_course;
 		this.gps_speed = gps_speed;
+
 		this.sea_level = sea_level;
-		this.barometric_relative_altitude = barometric_relative_altitude;
 		this.barometric_pressure = barometric_pressure;
+		this.barometric_relative_altitude = barometric_relative_altitude;
+
 		this.environment_context = environment_context;
 		this.environment_mean_bldg_floors = environment_mean_bldg_floors;
 		this.environment_activity = environment_activity;
