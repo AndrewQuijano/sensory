@@ -111,12 +111,18 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
 
     public void onSensorChanged(SensorEvent event)
     {
+        Log.d(TAG, "BAROMETER CHANGED");
         pressure = event.values[0];
-
+        Log.d(TAG, event.values.length + " Size of baro event");
+        for (double i : event.values)
+        {
+            Log.d(TAG, "VALUE: " + i);
+        }
         // I may need an API to get Barometric pressure at my location instead of standard for more accuracy...
         barometricAltitude = SensorManager.getAltitude((float) pressure_at_sea_level, (float) pressure);
         if(Double.isNaN(barometricAltitude))
         {
+            Log.d(TAG, "FAILED TO COMPUTE ALTITUDE");
             barometricAltitude = -1.0;
         }
     }
@@ -149,6 +155,9 @@ public class BarometricAltimeter implements SensorEventListener, Runnable
                     pressure_at_sea_level = parse_Sea_Level(server_response);
                 }
                 Log.d(TAG, "pressure at sea: " + pressure_at_sea_level);
+                Log.d(TAG, "pressure measured: " + pressure);
+                Log.d(TAG, "barometric altitude: " + barometricAltitude);
+
                 // PERMITTED ONLY 1 TIME PER 10 MINUTES, PUTTING 1 MORE MINUTE AS SLACK!
                 Thread.sleep(11 * 60 * 1000);
             }

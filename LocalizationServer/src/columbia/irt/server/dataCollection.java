@@ -142,8 +142,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			
 			// (5) Environment
 			insert.setString(21, input.environment_context());
-			insert.setString(22, input.environment_context());
-			insert.setString(23, input.environment_mean_bldg_floors());
+			insert.setString(22, input.environment_mean_bldg_floors());
+			insert.setString(23, input.environment_activity());
 			insert.setString(24, input.city_name());
 			insert.setString(25, input.country_name());
 		
@@ -315,9 +315,11 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					"  `gps_horizontal_accuracy` int DEFAULT NULL, " + 
 					"  `gps_course` float DEFAULT NULL, " + 
 					"  `gps_speed` float DEFAULT NULL, " + 
+					
 					"  `baro_sea_level` float DEFAULT NULL, " + // new
 					"  `baro_pressure` float DEFAULT NULL, " + 
 					"  `baro_relative_altitude` float DEFAULT NULL, " + 
+					
 					"  `env_context` varchar(100) DEFAULT NULL, " + 
 					"  `env_mean_bldg_floors` varchar(100) DEFAULT NULL, " + 
 					"  `env_activity` varchar(100) DEFAULT NULL, " + 
