@@ -160,6 +160,10 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			
 			//DO NOT FORGET TO COMMIT!!
 			conn.prepareCall("commit;").execute();
+			
+			// Close SQL 
+			insert.close();
+			conn.close();
 			return true;
 		}
 		catch(SQLException se)
@@ -193,6 +197,10 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			{
 				id = rs.getInt(1);
 			}
+			
+			// Close SQL 
+			st.close();
+			conn.close();
 			return id;
 		}
 		catch(SQLException | ClassNotFoundException se)
@@ -252,6 +260,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			}
 			
 			conn.prepareCall("commit;").execute();
+			conn.close();
 			return true;
 		}
 		catch(SQLException se)
@@ -359,6 +368,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					+ "FOREIGN KEY (ID) REFERENCES " + DB + '.' + TRAININGDATA + "(ID) "
 					+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci");
 			stmt.close();
+			conn.close();
 			return true;
 		}
 
@@ -443,6 +453,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 				writeCSV.println();
 			}
 			writeCSV.close();
+			st.close();
+			conn.close();
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -492,6 +504,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			{
 				common_aps.add(rs.getString("MACADDRESS"));
 			}
+			state.close();
+			conn.close();
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -545,6 +559,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 				writeCSV.println(rs.getString("MACADDRESS") + ',' + rs.getString("count"));
 			}
 			writeCSV.close();
+			state.close();
+			conn.close();
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -600,6 +616,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			sql +=");";
 			//System.out.println(sql);
 			stmt.executeUpdate(sql);	
+			stmt.close();
+			conn.close();
 			return true;
 		}
 		catch(SQLException | ClassNotFoundException se)
@@ -700,6 +718,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			{
 				ids.add(rs.getInt(1));
 			}
+			st.close();
+			conn.close();
 			return ids;
 		}
 		catch(SQLException | ClassNotFoundException se)
@@ -806,6 +826,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			// DON'T FORGET TO COMMIT!!!
 			stmt = conn.prepareStatement("commit;");
 			stmt.executeQuery();
+			stmt.close();
 			conn.close();
 			return true;
 		}
