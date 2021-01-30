@@ -180,6 +180,13 @@ public class CollectionFragment extends Fragment
 
         public void afterTextChanged(Editable editable)
         {
+            /*
+            if(main.building.equals(""))
+            {
+                main.building = gps.address;
+                building.setText(gps.address);
+            }
+            */
             // Upon exiting Edit Text
             main.building = building.getText().toString();
             Log.d("TEXT-BUILDING", main.building);
@@ -220,6 +227,13 @@ public class CollectionFragment extends Fragment
 
         public void afterTextChanged(Editable editable)
         {
+            /*
+            if(main.env_context.equals(""))
+            {
+                main.env_context = gps.env_context;
+                env_context.setText(gps.env_context);
+            }
+            */
             // Upon exiting Edit Text
             main.env_context = env_context.getText().toString();
             Log.d("TEXT-ENV", main.env_context);
@@ -258,8 +272,6 @@ public class CollectionFragment extends Fragment
                 gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
                 wifi.wifi_results);
         current_floor_data.setText(f.toString());
-        building.setText(gps.address);
-        env_context.setText(gps.env_context);
     }
 
     protected class indoors implements CompoundButton.OnCheckedChangeListener
