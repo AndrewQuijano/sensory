@@ -5,8 +5,11 @@
 
 package columbia.irt.sensors;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,6 +19,8 @@ import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -30,8 +35,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class GPSAltimeter implements LocationListener, Runnable
-{
+public class GPSAltimeter implements LocationListener, Runnable {
     private final static String BASE_URL = "https://maps.googleapis.com/maps/api/elevation/json?locations=";
     //private final static String API_KEY = "&key=" + R.string.API_KEY;
     private final static String API_KEY = "&key=AIzaSyBYJbhGFl17ejbVxeiqlcoSk2epVB3ALd0";
@@ -59,15 +63,24 @@ public class GPSAltimeter implements LocationListener, Runnable
     private Thread updateAltitude;
     private boolean isThreadRunning = false;
 
-    public GPSAltimeter(Context context)
-    {
+    public GPSAltimeter(Context context) {
         geocoder = new Geocoder(context, Locale.getDefault());
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 
-    @SuppressLint("MissingPermission")
-    public void start()
-    {
+    public void start(Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions((Activity) context,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, 1001);
+            return;
+        }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 1000, 0, this);
         isThreadRunning = true;
         (updateAltitude = new Thread(this)).start();

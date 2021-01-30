@@ -1,19 +1,19 @@
 package columbia.irt.sensory;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import columbia.irt.motion.MotionReceiver;
 import columbia.irt.sensors.AudioSensor;
@@ -43,19 +43,28 @@ public class MapsActivity extends FragmentActivity
     protected Button collection;
     protected Button set_map;
 
+    // Collection Fragment settings (in case activity changes)
+    protected boolean collect = false;
+    protected boolean indoors = false;
+    protected boolean center = false;
+
+    // Collection Fragment may be bad to leave Timer Information to run
+    // As it forgets the moment you leave the fragment
+    protected Timer tick = null;
+    protected TimerTask timerTask = null;
+
+    // Main Activity should save information of labels
+    // so I avoid having to re-label if I accidentally hit map
+    protected String env_context = "GS";
+    protected String room = "606";
+    protected String building = "Lewisohn";
+    protected int mean_floor_idx = 1;
+    protected int floor_idx = 1;
+
     @SuppressLint("ShowToast")
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, 1001);
-        }
 
         // Build Sensors
         SensorManager my_SensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -86,7 +95,7 @@ public class MapsActivity extends FragmentActivity
     protected void onStart()
     {
         super.onStart();
-        gps.start();
+        gps.start(this);
         barometer.start();
         magneto.start();
         motion.register(this);
@@ -102,7 +111,7 @@ public class MapsActivity extends FragmentActivity
     protected void onResume()
     {
         super.onResume();
-        gps.start();
+        gps.start(this);
         barometer.start();
         magneto.start();
         motion.register(this);

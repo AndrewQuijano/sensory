@@ -3,6 +3,8 @@ package columbia.irt.sensory;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,16 +52,16 @@ public class CollectionFragment extends Fragment
     private String [] env_building_mean_floor_options;
 
     // IP data
-    public final static String SQLDatabase = "72.229.36.215";
-    public final static int portNumber = 9254;
+    protected final static String SQLDatabase = "72.229.36.215";
+    protected final static int portNumber = 9254;
     private String android_model;
 
     // Timer stuff
-    private Timer tick = new Timer();
-    private TimerTask timerTask;
+    //private Timer tick = null;
+    //private TimerTask timerTask = null;
 
-    Toast send_successful;
-    Toast send_failed;
+    private Toast send_successful;
+    private Toast send_failed;
 
     // variables
     private int isIndoor = 0;
@@ -122,24 +124,128 @@ public class CollectionFragment extends Fragment
         floor.setMinValue(1);
         floor.setMaxValue(floor_options.length);
         floor.setDisplayedValues(floor_options);
+        floor.setOnValueChangedListener(new listen_floor());
 
         // Fill env_build_mean_floor picker
         env_building_mean_floor_options = new String[]{"0-2", "3-5", "6-10", "10-20", "20-50", "50+"};
         env_building_mean_floor.setMinValue(1);
         env_building_mean_floor.setMaxValue(env_building_mean_floor_options.length);
         env_building_mean_floor.setDisplayedValues(env_building_mean_floor_options);
+        env_building_mean_floor.setOnValueChangedListener(new listen_mean_floor());
 
         // Connect Switches/EditText
         start.setOnCheckedChangeListener(new scan());
         center.setOnCheckedChangeListener(new center());
         indoors.setOnCheckedChangeListener(new indoors());
+        room.addTextChangedListener(new listen_room());
+        env_context.addTextChangedListener(new listen_env_context());
+        building.addTextChangedListener(new listen_building());
+
+        // Pull Information from last time fragment was executed
+        if(main.collect)
+        {
+            // Kill any Running Tasks
+            main.timerTask.cancel();
+            main.tick.cancel();
+            main.timerTask = null;
+            main.tick = null;
+            session_id = null;
+        }
+        start.setChecked(main.collect);
+        center.setChecked(main.center);
+        indoors.setChecked(main.indoors);
+
+        // Set all values based on Main Activity's memory of last time
+        env_context.setText(main.env_context);
+        room.setText(main.room);
+        building.setText(main.building);
+        env_building_mean_floor.setValue(main.mean_floor_idx);
+        floor.setValue(main.floor_idx);
         // Inflate the layout for this fragment
         return rootView;
     }
 
+    // https://stackoverflow.com/questions/14625423/detect-when-user-enters-data-into-edittext-immediately-shows-answer
+    private class listen_building implements TextWatcher
+    {
+        public void beforeTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // Before I open EditText
+        }
+
+        public void onTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // While text is changing
+        }
+
+        public void afterTextChanged(Editable editable)
+        {
+            // Upon exiting Edit Text
+            main.building = building.getText().toString();
+            Log.d("TEXT-BUILDING", main.building);
+        }
+    }
+
+    private class listen_room implements TextWatcher
+    {
+        public void beforeTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // Before I open EditText
+        }
+
+        public void onTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // While text is changing
+        }
+
+        public void afterTextChanged(Editable editable)
+        {
+            // Upon exiting Edit Text
+            main.room = room.getText().toString();
+            Log.d("TEXT-ROOM", main.building);
+        }
+    }
+
+    private class listen_env_context implements TextWatcher
+    {
+        public void beforeTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // Before I open EditText
+        }
+
+        public void onTextChanged(CharSequence charSequence, int start, int before, int count)
+        {
+            // While text is changing
+        }
+
+        public void afterTextChanged(Editable editable)
+        {
+            // Upon exiting Edit Text
+            main.env_context = env_context.getText().toString();
+            Log.d("TEXT-ENV", main.env_context);
+        }
+    }
+
+    // https://stackoverflow.com/questions/14185317/adding-a-listener-to-a-number-picker-widget
+    private class listen_floor implements NumberPicker.OnValueChangeListener
+    {
+        public void onValueChange(NumberPicker numberPicker, int oldVal, int newVal)
+        {
+            main.floor_idx = newVal;
+        }
+    }
+
+    private class listen_mean_floor implements NumberPicker.OnValueChangeListener
+    {
+        public void onValueChange(NumberPicker numberPicker, int oldVal, int newVal)
+        {
+            main.mean_floor_idx = newVal;
+        }
+    }
+
     public void onViewCreated (@NonNull View view, Bundle savedInstanceState)
     {
-        gps.start();
+        gps.start(main);
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
         f = new FloorData(isIndoor, timeStamp, session_id, android_model, room.getText().toString(),
                 floor_options[floor.getValue() - 1], building.getText().toString(),
@@ -163,9 +269,11 @@ public class CollectionFragment extends Fragment
             if(isChecked)
             {
                 isIndoor = 1;
+                main.indoors = true;
             }
             else
             {
+                main.indoors = false;
                 isIndoor = 0;
             }
         }
@@ -178,9 +286,11 @@ public class CollectionFragment extends Fragment
             if (isChecked)
             {
                 isCenter = 1;
+                main.indoors = true;
             }
             else
             {
+                main.indoors = false;
                 isCenter = 0;
             }
         }
@@ -193,29 +303,30 @@ public class CollectionFragment extends Fragment
             // 1 scan per second
             int sampling_rate = 1;
 
+            // Main Fragment should remember status in case you forgot...
             if (isChecked)
             {
-                Log.d("HELLO", "ON");
                 // Get data from sensors
-                if (tick == null)
+                if (main.tick == null)
                 {
-                    tick = new Timer();
+                    main.tick = new Timer();
                 }
-                if (timerTask == null)
+                if (main.timerTask == null)
                 {
-                    timerTask = new scan();
+                    main.timerTask = new scan();
                 }
+                main.collect = true;
                 // Put here time 1,000 milliseconds = 1 second
-                tick.schedule(timerTask, 0, 1000 * sampling_rate);
+                main.tick.schedule(main.timerTask, 0, 1000 * sampling_rate);
             }
             else
             {
-                Log.d("HELLO", "OFF");
-                timerTask.cancel();
-                tick.cancel();
-                timerTask = null;
-                tick = null;
+                main.timerTask.cancel();
+                main.tick.cancel();
+                main.timerTask = null;
+                main.tick = null;
                 session_id = null;
+                main.collect = false;
             }
         }
 
@@ -223,19 +334,23 @@ public class CollectionFragment extends Fragment
         {
             try
             {
+                // Store in Activity
+                main.mean_floor_idx = env_building_mean_floor.getValue();
+                main.floor_idx = floor.getValue();
+
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
                 if (session_id == null)
                 {
                     session_id = timeStamp;
                 }
-                f = new FloorData(isIndoor, timeStamp, session_id, android_model, room.getText().toString(),
-                        floor_options[floor.getValue() - 1], building.getText().toString(),
+                f = new FloorData(isIndoor, timeStamp, session_id, android_model, main.room,
+                        floor_options[main.floor_idx - 1], main.building,
                         wifi.getConnectedMAC(), wifi.getConnectedRSSI(), isCenter,
                         gps.altitude,
                         gps.latitude, gps.longitude, gps.vAccuracy, gps.hAccuracy, gps.course, gps.speed,
                         barometer.pressure_at_sea_level, barometer.pressure, barometer.barometricAltitude,
-                        env_context.getText().toString(),
-                        env_building_mean_floor_options[env_building_mean_floor.getValue() - 1], motion.getActivity(),
+                        main.env_context,
+                        env_building_mean_floor_options[main.mean_floor_idx - 1], motion.getActivity(),
                         gps.city_name, gps.country_name, magneto.magnetX, magneto.magnetY, magneto.magnetZ,
                         wifi.wifi_results);
                 current_floor_data.post(() -> current_floor_data.setText(f.toString()));
