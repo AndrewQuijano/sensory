@@ -120,6 +120,10 @@ public class CollectionFragment extends Fragment
         floor.setMinValue(1);
         floor.setMaxValue(floor_options.length);
         floor.setDisplayedValues(floor_options);
+        Log.d("CURRENT-FLOOR-IDX-NOW", String.valueOf(main.floor_idx));
+        floor.setValue(main.floor_idx);
+        Log.d("CURRENT-FLOOR-IDX-CHG", String.valueOf(floor.getValue()));
+
         floor.setOnValueChangedListener(new listen_floor());
 
         // Fill env_build_mean_floor picker
@@ -127,6 +131,7 @@ public class CollectionFragment extends Fragment
         env_building_mean_floor.setMinValue(1);
         env_building_mean_floor.setMaxValue(env_building_mean_floor_options.length);
         env_building_mean_floor.setDisplayedValues(env_building_mean_floor_options);
+        env_building_mean_floor.setValue(main.mean_floor_idx);
         env_building_mean_floor.setOnValueChangedListener(new listen_mean_floor());
 
         // Connect Switches/EditText
@@ -155,8 +160,7 @@ public class CollectionFragment extends Fragment
         env_context.setText(main.env_context);
         room.setText(main.room);
         building.setText(main.building);
-        env_building_mean_floor.setValue(main.mean_floor_idx);
-        floor.setValue(main.floor_idx);
+
         // Inflate the layout for this fragment
         return rootView;
     }
@@ -242,6 +246,7 @@ public class CollectionFragment extends Fragment
         public void onValueChange(NumberPicker numberPicker, int oldVal, int newVal)
         {
             main.floor_idx = newVal;
+            Log.d("FLOOR", String.valueOf(main.floor_idx));
         }
     }
 
@@ -250,6 +255,7 @@ public class CollectionFragment extends Fragment
         public void onValueChange(NumberPicker numberPicker, int oldVal, int newVal)
         {
             main.mean_floor_idx = newVal;
+            Log.d("MEAN-FLOOR", String.valueOf(main.mean_floor_idx));
         }
     }
 
