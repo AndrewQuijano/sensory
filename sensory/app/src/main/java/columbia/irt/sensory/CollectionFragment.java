@@ -145,6 +145,7 @@ public class CollectionFragment extends Fragment
         // Pull Information from last time fragment was executed
         if(main.collect)
         {
+            Toast.makeText(main, "Was Collecting. Now killing", Toast.LENGTH_SHORT).show();
             // Kill any Running Tasks
             main.timerTask.cancel();
             main.tick.cancel();
