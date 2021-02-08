@@ -137,8 +137,6 @@ public class Server implements Runnable
 		// Create the Schema and Tables
 		dataCollection.init();
 		
-		//System.exit(0);
-		
 		// Run the server
 		Server Localizationserver = new Server(port);
 		new Thread(Localizationserver).start();

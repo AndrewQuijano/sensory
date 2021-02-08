@@ -61,7 +61,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 				WifiData wifi = f.wifi();
 				int scan = getScanID();
 
-				result = submitWifiData(scan, f.room(), f.floor(), f.building(), wifi);
+				result = submitWifiData(scan, f, wifi);
 				toClient.writeBoolean(result);
 				toClient.flush();
 			}
@@ -210,7 +210,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 		}
 	}
 	
-	public static boolean submitWifiData(int scanID, String Room, String floor, String Building, WifiData result)
+	public static boolean submitWifiData(int scanID, FloorData f, WifiData result)
 	{
 		PreparedStatement insert = null;
 		try
@@ -224,35 +224,36 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			{
 				insert = conn.prepareStatement(""
 						+ "insert into " + DB + "." + APTRAIN + " values("
-						+ "?, ?, ?, ?, " 	// (4) Scan ID and labels
-						+ "?, ?, ?, ?, ?, "	// (5) Basic Scan Result Labels
-						+ "?, ?, ?, ?, "	// (4) First 4 advanced features
-						+ "?, ?, ?, ? "		// (4) Last 4 advanced features
+						+ "?, ?, ?, ?, ?, " 	// (4) Scan ID, Session ID and labels
+						+ "?, ?, ?, ?, ?, "		// (5) Basic Scan Result Labels
+						+ "?, ?, ?, ?, "		// (4) First 4 advanced features
+						+ "?, ?, ?, ? "			// (4) Last 4 advanced features
 						+ ");");
 				
 				// Scan id and labels
 				insert.setInt(1, scanID);
-				insert.setString(2, Room);
-				insert.setString(3, floor);
-				insert.setString(4, Building);
+				insert.setString(2, f.session_id());
+				insert.setString(3, f.room());
+				insert.setString(4, f.floor());
+				insert.setString(5, f.building());
 				
 				// Basic 5
-				insert.setString(5, result.WifiAPs[i]);
-				insert.setString(6, result.SSID[i]);
-				insert.setString(7, result.capabilities[i]);
-				insert.setInt(8, result.frequency[i]);
-				insert.setInt(9, result.WifiRSS[i]);
+				insert.setString(6, result.WifiAPs[i]);
+				insert.setString(7, result.SSID[i]);
+				insert.setString(8, result.capabilities[i]);
+				insert.setInt(9, result.frequency[i]);
+				insert.setInt(10, result.WifiRSS[i]);
 				
 				// 8 Advanced features
-				insert.setInt(10, result.centerFreq0[i]);
-				insert.setInt(11, result.centerFreq1[i]);
-				insert.setString(12, result.channelWidth[i]);
-				insert.setString(13, result.operatorFriendlyName[i]);
+				insert.setInt(11, result.centerFreq0[i]);
+				insert.setInt(12, result.centerFreq1[i]);
+				insert.setString(13, result.channelWidth[i]);
+				insert.setString(14, result.operatorFriendlyName[i]);
 			
-				insert.setLong(14, result.timestamp[i]);
-				insert.setString(15, result.vanueName[i]);
-				insert.setInt(16, result.is80211mc[i]);
-				insert.setInt(17, result.isPassPoint[i]);
+				insert.setLong(15, result.timestamp[i]);
+				insert.setString(16, result.vanueName[i]);
+				insert.setInt(17, result.is80211mc[i]);
+				insert.setInt(18, result.isPassPoint[i]);
 
 				//Execute and Close SQL Command
 				insert.execute();
