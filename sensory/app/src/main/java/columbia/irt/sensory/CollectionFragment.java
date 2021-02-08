@@ -1,6 +1,5 @@
 package columbia.irt.sensory;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import android.text.Editable;
@@ -56,8 +55,11 @@ public class CollectionFragment extends Fragment
     protected final static int portNumber = 9254;
     private String android_model;
 
+    // Show message
     private Toast send_successful;
     private Toast send_failed;
+    private Toast timeout;
+    private Toast io_exception;
 
     // variables
     private int isIndoor = 0;
@@ -79,7 +81,6 @@ public class CollectionFragment extends Fragment
         super.onCreate(savedInstanceState);
     }
 
-    @SuppressLint("ShowToast")
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
@@ -93,8 +94,10 @@ public class CollectionFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.collection_settings, container, false);
 
-        send_successful = Toast.makeText(getActivity(), "Data sent!", Toast.LENGTH_SHORT);
-        send_failed = Toast.makeText(getActivity(), "Data Failed!", Toast.LENGTH_SHORT);
+        send_successful = Toast.makeText(main, "Data sent!", Toast.LENGTH_SHORT);
+        send_failed = Toast.makeText(main, "Data Failed!", Toast.LENGTH_SHORT);
+        timeout = Toast.makeText(main, "Timeout Exception! Is Collection Server online?", Toast.LENGTH_SHORT);
+        io_exception = Toast.makeText(main, "IO Exception! Are you on Wi-Fi?", Toast.LENGTH_SHORT);
 
         String DEVICE = android.os.Build.DEVICE;            // Device
         String MODEL = android.os.Build.MODEL;              // Model
@@ -370,9 +373,9 @@ public class CollectionFragment extends Fragment
                         wifi.wifi_results);
                 current_floor_data.post(() -> current_floor_data.setText(f.toString()));
 
-                // I/O
+                // I/O, time out 1 second.
                 Socket clientSocket = new Socket();
-                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 2 * 1000);
+                clientSocket.connect(new InetSocketAddress(SQLDatabase, portNumber), 1000);
 
                 // Send Data
                 ObjectOutputStream toServer = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -391,10 +394,12 @@ public class CollectionFragment extends Fragment
             }
             catch(SocketTimeoutException ioe)
             {
+                timeout.show();
                 ioe.printStackTrace();
             }
             catch(IOException ioe)
             {
+                io_exception.show();
                 ioe.printStackTrace();
             }
         }

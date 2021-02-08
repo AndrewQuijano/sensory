@@ -4,8 +4,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.annotation.SuppressLint;
-
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -61,7 +59,6 @@ public class MapsActivity extends FragmentActivity
     protected int mean_floor_idx = 1;
     protected int floor_idx = 1;
 
-    @SuppressLint("ShowToast")
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
