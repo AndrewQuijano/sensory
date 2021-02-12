@@ -437,7 +437,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 				for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 				{
 					int type = resultSetMetaData.getColumnType(i);
-					if (type == Types.VARCHAR || type == Types.CHAR) 
+					// if type == -1, that is type TEXT, so just print as string
+					if (type == Types.VARCHAR || type == Types.CHAR || type == -1) 
 					{
 						writeCSV.print(rs.getString(i));
 					}
@@ -448,6 +449,10 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					else if(type == Types.INTEGER || type == Types.REAL)
 					{
 						writeCSV.print(rs.getInt(i));	
+					}
+					else
+					{
+						
 					}
 					writeCSV.print(',');
 				}
@@ -518,7 +523,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 		}
 		return common_aps;
 	}
-	
+
 	/**
 	 * Create a frequency map of detected Access Points.
 	 * The purpose is to allow the user to know how many Access Points to filter.
@@ -599,8 +604,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					"CREATE TABLE IF NOT EXISTS " + DB + "." + building +
 					"("
 					+ " ID Integer not NULL, "
-					+ " Room Text not NULL, "
-					+ " Floor Text not NULL, ";
+					+ " Room  varchar(100) not NULL, "
+					+ " Floor varchar(100) not NULL, ";
 			String add = "";
 			for (int i = 0; i < MAC_Address.size(); i++)
 			{
@@ -758,10 +763,15 @@ public class dataCollection extends SqlConfiguration implements Runnable
 				WHERE MACADDRESS = 'f4:f2:6d:f9:e8:85'
 				and ID=1089;
 				 */
+				
+				// Note: Room and Floor will be the same
+				String room = "";
+				String floor = "";
 				// Iterate over every MAC Address column in the Lookup Table
 				for (int currentCol = 0; currentCol < mac_columns.size(); currentCol++)
 				{
-					RSS_query = "SELECT Room, Floor, RSS FROM " + DB + "." + APTRAIN + " "
+					RSS_query = "SELECT Room, Floor, RSS FROM " 
+							+ DB + "." + APTRAIN + " "
 							+ " WHERE MACADDRESS = ? "
 							+ " AND ID = ? "
 							+ ";";
@@ -773,8 +783,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					while (rs.next())
 					{
 						rssi_table[x][currentCol] = rs.getInt("RSS");
-						rooms.add(rs.getString("Room"));
-						floors.add(rs.getString("Floor"));
+						room = rs.getString("Room");
+						floor = rs.getString("Floor");
 					}
 					
 					//CHECK IF I GOT A NULL!
@@ -784,6 +794,8 @@ public class dataCollection extends SqlConfiguration implements Runnable
 					}
 					stmt.close();		
 				}
+				rooms.add(room);
+				floors.add(floor);
 			}
 			
 			// Set up the Query to update the Lookup Table
