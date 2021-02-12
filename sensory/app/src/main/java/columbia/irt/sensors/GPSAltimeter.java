@@ -63,6 +63,8 @@ public class GPSAltimeter implements LocationListener, Runnable {
     private Thread updateAltitude;
     private boolean isThreadRunning = false;
 
+    private Location last_location;
+
     public GPSAltimeter(Context context) {
         geocoder = new Geocoder(context, Locale.getDefault());
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -107,26 +109,20 @@ public class GPSAltimeter implements LocationListener, Runnable {
         Log.d(TAG, "GPS Paused/Destroyed!");
     }
 
-    public void onLocationChanged(Location loc)
-    {
+    public void onLocationChanged(Location loc) {
         longitude = loc.getLongitude();
         latitude = loc.getLatitude();
         hAccuracy = loc.getAccuracy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vAccuracy = loc.getVerticalAccuracyMeters();
-        }
-        else
-        {
+        } else {
             vAccuracy = -1;
         }
 
         course = loc.getBearing();
-        speed = loc.getSpeed();
 
         /*------- To get city name from coordinates -------- */
-        try
-        {
+        try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             address = addresses.get(0).getThoroughfare();
             env_context = addresses.get(0).getFeatureName();
@@ -137,6 +133,28 @@ public class GPSAltimeter implements LocationListener, Runnable {
         catch (IOException e)
         {
             e.printStackTrace();
+        }
+
+        if(last_location == null)
+        {
+            last_location = loc;
+            speed = 0;
+        }
+        else
+        {
+            if (loc.hasSpeed() && loc.getSpeed() > 0)
+            {
+                speed = loc.getSpeed();
+            }
+            else
+            {
+                // Convert milliseconds to seconds
+                long elapsedTimeInSeconds = (loc.getTime() - last_location.getTime()) / 1000;
+                float distanceInMeters = last_location.distanceTo(loc);
+                // Speed in m/s
+                speed = distanceInMeters / elapsedTimeInSeconds;
+            }
+            last_location = loc;
         }
     }
 
