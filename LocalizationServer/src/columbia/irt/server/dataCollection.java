@@ -224,7 +224,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			{
 				insert = conn.prepareStatement(""
 						+ "insert into " + DB + "." + APTRAIN + " values("
-						+ "?, ?, ?, ?, ?, " 	// (4) Scan ID, Session ID and labels
+						+ "?, ?, ?, ?, ?, " 	// (5) Scan ID, Session ID and labels
 						+ "?, ?, ?, ?, ?, "		// (5) Basic Scan Result Labels
 						+ "?, ?, ?, ?, "		// (4) First 4 advanced features
 						+ "?, ?, ?, ? "			// (4) Last 4 advanced features
@@ -349,6 +349,7 @@ public class dataCollection extends SqlConfiguration implements Runnable
 			stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + DB + "." + APTRAIN
 					+ "( " 
 					+ "ID Integer NOT NULL, "
+					+ "session_id varchar(100) NOT NULL, "
 					+ "Room varchar(100) DEFAULT NULL,  "
 					+ "Floor varchar(100) DEFAULT NULL,  "
 					+ "Building varchar(100) DEFAULT NULL,  "
