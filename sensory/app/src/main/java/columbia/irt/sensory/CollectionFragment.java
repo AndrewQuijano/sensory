@@ -41,8 +41,8 @@ public class CollectionFragment extends Fragment
     protected Switch start;
     protected Switch indoors;
     protected Switch center;
-    private NumberPicker floor;
-    private NumberPicker env_building_mean_floor;
+    protected NumberPicker floor;
+    protected NumberPicker env_building_mean_floor;
     private EditText env_context;
     protected EditText current_floor_data;
     protected EditText room;
@@ -352,9 +352,16 @@ public class CollectionFragment extends Fragment
         {
             try
             {
-                // Store in Activity
-                main.mean_floor_idx = env_building_mean_floor.getValue();
-                main.floor_idx = floor.getValue();
+
+                //Looper.prepare();
+                if(wifi.startScan())
+                {
+                    main.runOnUiThread(() -> Toast.makeText(main, "Manually updated Wi-Fi!", Toast.LENGTH_SHORT).show());
+                }
+                else
+                {
+                    main.runOnUiThread(() -> Toast.makeText(main, "FAILED TO Manually update Wi-Fi!", Toast.LENGTH_SHORT).show());
+                }
 
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
                 if (session_id == null)
@@ -383,14 +390,11 @@ public class CollectionFragment extends Fragment
                 toServer.writeObject(f);
                 toServer.flush();
 
-                if(fromServer.readBoolean())
-                {
-                    send_successful.show();
-                }
-                else
+                if (!fromServer.readBoolean())
                 {
                     send_failed.show();
                 }
+                // send_successful.show();
             }
             catch(SocketTimeoutException ioe)
             {

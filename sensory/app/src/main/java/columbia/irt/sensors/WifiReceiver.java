@@ -7,16 +7,16 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
 
 import columbia.irt.struct.WifiData;
 
 import static android.widget.Toast.LENGTH_LONG;
-import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
-public class WifiReceiver extends BroadcastReceiver implements Runnable
+public class WifiReceiver extends BroadcastReceiver
 {
     private final static String TAG = "MAIN_SCANNER";
     private final WifiManager my_wifiManager;
@@ -26,11 +26,8 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
     private List<ScanResult> results;
     public WifiData wifi_results;
 
-    private final Context context;
-
     public WifiReceiver(Context context)
     {
-        this.context = context;
         my_wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if(my_wifiManager == null)
         {
@@ -54,19 +51,12 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
         {
             context.registerReceiver(this, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
             isRegistered = true;
+            makeText(context.getApplicationContext(), "Registered Wifi Receiver!", Toast.LENGTH_SHORT).show();
             get_data();
-            makeText(context.getApplicationContext(), "Registered Wifi Receiver!", LENGTH_SHORT).show();
         }
     }
 
-    public void unregisterReceiver(Context context)
-    {
-        if(isRegistered)
-        {
-            context.unregisterReceiver(this);
-            isRegistered = false;
-        }
-    }
+
 
     // Try this...
     // https://stackoverflow.com/questions/13238600/use-registerreceiver-for-non-activity-and-non-service-class
@@ -77,6 +67,15 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
         {
             get_data();
             makeText(context.getApplicationContext(), "Got new data from WifiReceiver!", LENGTH_LONG).show();
+        }
+    }
+
+    public void unregisterReceiver(Context context)
+    {
+        if(isRegistered)
+        {
+            context.unregisterReceiver(this);
+            isRegistered = false;
         }
     }
 
@@ -94,21 +93,37 @@ public class WifiReceiver extends BroadcastReceiver implements Runnable
     {
         try
         {
-            run();
+            /*
+            if(isRegistered)
+            {
+                this.unregisterReceiver(context);
+                this.registerReceiver(context);
+            }
+            else
+            {
+                this.registerReceiver(context);
+                this.unregisterReceiver(context);
+            }
+            return true;
+             */
+            boolean result = my_wifiManager.startScan();
+            if(result)
+            {
+                get_data();
+                Log.d("SCAN", "START SCAN");
+                for (ScanResult res: results)
+                {
+                    Log.d("SCAN RESULT: ", res.toString());
+                }
+                Log.d("SCAN", "END SCAN");
+            }
+            return result;
         }
         catch (Exception e)
         {
             e.printStackTrace();
             return false;
         }
-        return true;
-    }
-
-    public void run()
-    {
-        this.unregisterReceiver(context);
-        this.registerReceiver(context);
-        get_data();
     }
 
     public String getConnectedMAC()

@@ -140,7 +140,7 @@ public class AudioSensor implements Runnable
         }
         catch(Exception e)
         {
-            Toast.makeText(context, "Recorder is currently Busy!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Recorder is currently Busy!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }

@@ -129,7 +129,7 @@ public class MapsActivity extends FragmentActivity
         barometer.stop();
         magneto.stop();
         motion.unregister(this);
-        wifi.registerReceiver(this);
+        wifi.unregisterReceiver(this);
 
         // Extra
         humid.stop();
@@ -146,7 +146,7 @@ public class MapsActivity extends FragmentActivity
         barometer.stop();
         magneto.stop();
         motion.unregister(this);
-        wifi.registerReceiver(this);
+        wifi.unregisterReceiver(this);
 
         humid.stop();
         light.stop();

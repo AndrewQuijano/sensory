@@ -83,7 +83,7 @@ public class GPSAltimeter implements LocationListener, Runnable {
                     }, 1001);
             return;
         }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 1000, 0, this);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2, 0, this);
         isThreadRunning = true;
         (updateAltitude = new Thread(this)).start();
         Log.d(TAG, "GPS Started!");
@@ -119,7 +119,15 @@ public class GPSAltimeter implements LocationListener, Runnable {
             vAccuracy = -1;
         }
 
-        course = loc.getBearing();
+        if (loc.hasBearing())
+        {
+            course = loc.getBearing();
+        }
+        else
+        {
+            course = -1;
+        }
+
 
         /*------- To get city name from coordinates -------- */
         try {

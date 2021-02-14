@@ -303,8 +303,9 @@ public class FloorData implements Serializable
 				',' +
 				this.magnet_z_mt() +
 				',' +
-				this.magnet_total() +
-				',' +
-				wifi().toString();
+				this.magnet_total();
+				//+
+				//',' +
+				//wifi().toString();
 	}
 }
